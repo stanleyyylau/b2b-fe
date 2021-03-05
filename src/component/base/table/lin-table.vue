@@ -166,6 +166,8 @@ export default {
     buttonMethods(func, index, row) {
       const _this = this
       const { methods } = this.$options
+      console.log(`func is ${func}`)
+      console.log(this.$options)
       methods[func](_this, index, row)
     },
     // 行内编辑
