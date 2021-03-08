@@ -69,12 +69,10 @@
 </template>
 
 <script>
-import LinTable from '@/component/base/table/lin-table'
 import product from '@/model/product'
 
 export default {
   components: {
-    LinTable,
   },
   async created() {
     await this.getProducts()
@@ -94,21 +92,37 @@ export default {
   data() {
     return {
       tableColumn: [
-        { prop: 'spu_name', label: 'SPU' }, 
-        {prop: 'img_url', label: '产品图片'},
-        {prop: 'price', label: '价格区间'},
-      { prop: 'catalog_id', label: '分类ID' }
+        {
+          prop: 'spu_name',
+          label: 'SPU',
+        },
+        {
+          prop: 'img_url',
+          label: '产品图片',
+        },
+        {
+          prop: 'price',
+          label: '价格区间',
+        },
+        {
+          prop: 'catalog_id',
+          label: '分类ID',
+        },
       ],
       tableData: [],
       operate: [
-      { name: '编辑', func: 'handleEdit', type: 'primary' },
-      {
-        name: '删除',
-        func: 'handleDelete',
-        type: 'danger',
-        permission: '删除图书',
-      },
-    ],
+        {
+          name: '编辑',
+          func: 'handleEdit',
+          type: 'primary',
+        },
+        {
+          name: '删除',
+          func: 'handleDelete',
+          type: 'danger',
+          permission: '删除图书',
+        },
+      ],
       showEdit: false,
       editBookID: 1,
     }

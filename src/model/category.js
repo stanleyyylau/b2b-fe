@@ -46,6 +46,15 @@ class Category {
     })
     return cates.filter(cat => cat.cat_level === 0)
   }
+
+  async getSecondLevelCategories() {
+    const cates = await _axios({
+      method: 'get',
+      url: 'v1/pms-category/list',
+      handleError: true,
+    })
+    return cates.filter(cat => cat.cat_level === 1)
+  }
 }
 
 export default new Category()

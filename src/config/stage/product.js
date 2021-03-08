@@ -12,8 +12,8 @@ const productRouter = {
       title: '添加产品',
       type: 'view',
       name: 'ProductCreate',
-      route: '/book/add',
-      filePath: 'view/book/book-create.vue',
+      route: '/product/add',
+      filePath: 'view/product/product-create.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
     },
@@ -48,11 +48,20 @@ const productRouter = {
       title: '产品属性',
       type: 'view',
       name: 'ProductAttr',
-      route: '/book/list',
-      filePath: 'view/book/book-list.vue',
+      route: '/attrGroup/list',
+      filePath: 'view/product/attr-group-list.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
     },
+    {
+      title: '新增产品属性',
+      type: 'view',
+      name: 'ProductAttr',
+      route: '/attr/add',
+      filePath: 'view/product/attr-create.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    }
   ],
 }
 

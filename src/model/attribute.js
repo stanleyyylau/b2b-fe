@@ -2,21 +2,14 @@
 import _axios, { get, put, _delete } from '@/lin/plugin/axios'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
-class Product {
+class Attribute {
   // constructor() {}
-  async createProduct(data) {
-    return _axios({
-      method: 'post',
-      url: 'v1/pms-spu-info/product',
-      data,
-    })
-  }
 
   // 类中的方法可以代表一个用户行为
-  async createBook(data) {
+  async createAttr(data) {
     return _axios({
       method: 'post',
-      url: 'v1/book',
+      url: 'v1/pms-attr',
       data,
     })
   }
@@ -39,13 +32,21 @@ class Product {
     return res
   }
 
-  async getProducts() {
+  async getAttrGroups() {
     return _axios({
       method: 'get',
-      url: 'v1/pms-spu-info/list',
+      url: 'v1/pms-attr-group/list',
+      handleError: true,
+    })
+  }
+
+  async getAttrsByGroupId(groupId) {
+    return _axios({
+      method: 'get',
+      url: `v1/pms-attr/groupId/${groupId}`,
       handleError: true,
     })
   }
 }
 
-export default new Product()
+export default new Attribute()
