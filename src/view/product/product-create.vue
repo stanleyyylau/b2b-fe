@@ -6,9 +6,9 @@
         <div class="title">新增产品</div>
       </div>
       <el-row>
-        <el-col :lg="16" :md="20" :sm="24" :xs="24">
+        <el-col :lg="20" :md="20" :sm="24" :xs="24">
           <el-form :model="form" status-icon ref="form" label-width="100px" @submit.native.prevent>
-            <el-form-item label="SPU" prop="spu_name">
+            <el-form-item label="SPU" prop="spu_name" required>
               <el-input size="medium" placeholder="SPU" v-model="form.spu_name"></el-input>
             </el-form-item>
             <el-form-item label="SPU Title" prop="spu_title">
@@ -20,10 +20,10 @@
             <el-form-item label="SPU Price" prop="price">
               <el-input size="medium" placeholder="SPU" v-model="form.price"></el-input>
             </el-form-item>
-            <el-form-item label="SPU Img" prop="img_url">
-              <el-input size="medium" placeholder="SPU" v-model="form.img_url"></el-input>
+            <el-form-item label="SPU Img" prop="img_url" required>
+              <upload-imgs ref="uploadEle" :value="initData" maxNum="1"/>
             </el-form-item>
-            <el-form-item label="分类" prop="catalog_id">
+            <el-form-item label="分类" prop="catalog_id" required>
               <el-select v-model="form.catalog_id" placeholder="选择产品分类">
                 <el-option
                   v-for="item in catOptions"
@@ -33,7 +33,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="属性组" prop="attr_group_id">
+            <el-form-item label="属性组" prop="attr_group_id" required>
               <el-select v-model="form.attr_group_id" placeholder="选择产品分类"
                          @change="handleAttrGroupChange"
               >
@@ -51,12 +51,13 @@
                 <el-form-item v-for="(attr, index) in basicAttr"
                               :label="attr.attrName + ':'"
                               :key="attr.attrId"
+                              label-width="200px"
+                              required
                 >
                   <el-select
                     v-model="basicAttrForm[index].selected"
                     multiple
                     filterable
-                    allow-create
                     default-first-option
                     placeholder="Choose tags for your article">
                     <el-option
@@ -75,6 +76,8 @@
                   <el-form-item v-for="(attr, index) in saleAttr"
                                 :label="attr.attrName + ':'"
                                 :key="attr.attrId"
+                                label-width="200px"
+                                required
                   >
                     <el-select
                       v-model="saleAttrForm[index].selected"
@@ -93,7 +96,7 @@
                   <el-button v-on:click="handleGenerateSKU">生成 SKU</el-button>
                 </div>
             </el-form-item>
-            <div class="skuTableWrap">
+            <div class="skuTableWrap" v-if="form.attr_group_id !== '' && form.catalog_id !== ''">
               <el-table
                 :data="skuList"
                 border
@@ -101,7 +104,7 @@
                 <el-table-column
                   prop="salesAttrs"
                   label="销售属性"
-                  width="180">
+                  width="200px">
                   <template slot-scope="scope">
                     <div
                       v-for="attr in scope.row.salesAttrs"
@@ -112,6 +115,7 @@
                 </el-table-column>
                 <el-table-column
                   prop="sku"
+                  min-width="200px"
                   label="SKU编号">
                   <template slot-scope="scope">
                     <el-input placeholder="SKU Model" v-model="scope.row.sku"></el-input>
@@ -119,6 +123,7 @@
                 </el-table-column>
                 <el-table-column
                   prop="skuName"
+                  width="250px"
                   label="SKU name">
                   <template slot-scope="scope">
                     <el-input placeholder="SKU Model" v-model="scope.row.skuName"></el-input>
@@ -126,6 +131,7 @@
                 </el-table-column>
                 <el-table-column
                   prop="price"
+                  min-width="250px"
                   label="price">
                   <template slot-scope="scope">
                     <div
@@ -154,9 +160,13 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button type="primary" v-on:click="handleProductAdd">确定新增产品</el-button>
             </div>
           </el-form>
+        </el-col>
+      </el-row>
+      <el-row class="confirm-button-row">
+        <el-col :lg="16" :md="20" :sm="24" :xs="24">
+          <el-button type="primary" v-on:click="handleProductAdd" :loading="loading">确定新增产品</el-button>
         </el-col>
       </el-row>
     </div>
@@ -168,15 +178,21 @@
 import category from '@/model/category'
 import attribute from '@/model/attribute'
 import product from '@/model/product'
+import UploadImgs from '@/component/base/upload-image'
 
 export default {
-  components: {},
+  components: {
+    UploadImgs
+  },
   async created() {
     await this.getSecondLevelCates()
     await this.getAttrGroups()
     this.loading = false
   },
   methods: {
+    async getValue() {
+      return this.$refs.uploadEle.getValue()
+    },
     goBack() {
       this.$router.back()
     },
@@ -268,31 +284,34 @@ export default {
       nenSkuList[targetIndex] = target
       this.skuList = nenSkuList
     },
-    handleProductAdd() {
+    async handleProductAdd() {
+      const valid = this.$refs.form.validate()
+      if (!valid) console.log('validation error...')
       console.log('product data is')
+      const imgInfo = await this.getValue()
+      const featureImgUrl = imgInfo[0].display
 
-      const transformSkuList = skuList => {
-        return skuList.map(sku => {
-          const skuObj = {
-            sku_name: sku.sku,
-            sku_title: sku.skuName,
-            price_list: sku.price.map(priceItem => ({
-              start_count: priceItem.minCount,
-              end_count: priceItem.maxCount,
-              price: priceItem.price
-            })),
-            sale_attr_list: sku.salesAttrs.map(saleAttr => ({
-              attr_id: saleAttr.saleAttrId,
-              attr_name: saleAttr.saleAttrName,
-              attr_value: saleAttr.saleAttrValue,
-            }))
-          }
-          return skuObj
-        })
-      }
+      const transformSkuList = skuList => skuList.map(sku => {
+        const skuObj = {
+          sku_name: sku.sku,
+          sku_title: sku.skuName,
+          price_list: sku.price.map(priceItem => ({
+            start_count: priceItem.minCount,
+            end_count: priceItem.maxCount,
+            price: priceItem.price
+          })),
+          sale_attr_list: sku.salesAttrs.map(saleAttr => ({
+            attr_id: saleAttr.saleAttrId,
+            attr_name: saleAttr.saleAttrName,
+            attr_value: saleAttr.saleAttrValue,
+          }))
+        }
+        return skuObj
+      })
 
       const productObject = {
         ...this.form,
+        img_url: featureImgUrl,
         basic_attr_list: this.basicAttrForm.map(attr => ({
           attr_id: attr.attrId,
           attr_name: this.findAttrNameById(attr.attrId),
@@ -302,11 +321,31 @@ export default {
       }
 
       console.log(productObject)
-      product.createProduct(productObject)
+
+      try {
+        this.loading = true
+        const res = await product.createProduct(productObject)
+        this.loading = false
+        if (res.code < window.MAX_SUCCESS_CODE) {
+          this.$message.success(`${res.message}`)
+          this.$router.back()
+        }
+      } catch (error) {
+        this.loading = false
+        this.$message.error('增加产品失败，请检测填写信息')
+        console.log(error)
+      }
     }
   },
   data() {
     return {
+      loading: false,
+      rules: {
+        minWidth: 100,
+        minHeight: 100,
+        maxSize: 1
+      },
+      initData: [],
       skuList: [],
       tableColumn: [
         {
@@ -455,4 +494,20 @@ export default {
   }
 }
 
+.confirm-button-row {
+  padding: 20px 0;
+}
+
+.wrap {
+  background-color: white;
+  padding: 20px 0 5px 0;
+  border: 1px solid #dcdfe5;
+  border-radius: 3px;
+  .el-form-item__content {
+    margin-bottom: 0!important;
+  }
+  .el-form-item {
+    margin-bottom: 0px !important;
+  }
+}
 </style>
