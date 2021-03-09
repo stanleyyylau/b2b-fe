@@ -12,6 +12,13 @@ class Product {
     })
   }
 
+  async getProductDetail(id) {
+    return _axios({
+      method: 'get',
+      url: `v1/pms-spu-info/detail/${id}`
+    })
+  }
+
   // 类中的方法可以代表一个用户行为
   async createBook(data) {
     return _axios({

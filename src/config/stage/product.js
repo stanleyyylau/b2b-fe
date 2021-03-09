@@ -18,6 +18,15 @@ const productRouter = {
       icon: 'iconfont icon-tushuguanli',
     },
     {
+      title: '编辑产品',
+      type: 'view',
+      name: 'ProductEdit',
+      route: '/product/edit',
+      filePath: 'view/product/product-edit.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    },
+    {
       title: '产品列表',
       type: 'view',
       name: 'ProductList',

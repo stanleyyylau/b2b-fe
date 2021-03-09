@@ -58,7 +58,11 @@
           label="Operations"
           width="170">
           <template slot-scope="scope">
-            <el-button plain type="primary" size="mini">Edit</el-button>
+            <el-button plain type="primary" size="mini"
+                       @click.native.prevent.stop="handleEdit(scope.row.id)"
+            >
+              Edit
+            </el-button>
             <el-button plain type="danger" size="mini">Delete</el-button>
           </template>
         </el-table-column>
@@ -87,6 +91,9 @@ export default {
           this.tableData = []
         }
       }
+    },
+    handleEdit(productId) {
+      this.$router.push({ path: '/product/edit', query: { id: productId } })
     }
   },
   data() {
