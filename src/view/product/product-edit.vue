@@ -166,7 +166,7 @@
       </el-row>
       <el-row class="confirm-button-row">
         <el-col :lg="16" :md="20" :sm="24" :xs="24">
-          <el-button type="primary" v-on:click="handleProductAdd" :loading="loading">确定新增产品</el-button>
+          <el-button type="primary" v-on:click="handleProductAdd" :loading="loading">修改产品</el-button>
         </el-col>
       </el-row>
     </div>
@@ -206,12 +206,14 @@ export default {
         spu_name: detail.spu_name,
         spu_title: detail.spu_title,
         spu_description: detail.spu_description,
-        catalog_id: String(detail.catalog_id),
-        attr_group_id: String(detail.attr_group_id),
+        catalog_id: detail.catalog_id,
+        attr_group_id: detail.attr_group_id,
         img_url: detail.img_url,
         price: detail.price,
         publish_status: 1,
       }
+      // set default img
+      this.initData = [{ display: detail.img_url }]
       await this.initAttrGroups(String(detail.attr_group_id), detail)
       const skuList = detail.sku_list.map(sku => ({
         skuId: sku.id,
@@ -348,6 +350,7 @@ export default {
       this.skuList = nenSkuList
     },
     async handleProductAdd() {
+      const pid = Number(this.$router.history.current.query.id)
       const valid = this.$refs.form.validate()
       if (!valid) console.log('validation error...')
       console.log('product data is')
@@ -383,11 +386,12 @@ export default {
         sku_list: transformSkuList(this.skuList)
       }
 
+      console.log('updating product')
       console.log(productObject)
 
       try {
         this.loading = true
-        const res = await product.createProduct(productObject)
+        const res = await product.updateProduct(pid, productObject)
         this.loading = false
         if (res.code < window.MAX_SUCCESS_CODE) {
           this.$message.success(`${res.message}`)

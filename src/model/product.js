@@ -12,10 +12,25 @@ class Product {
     })
   }
 
+  async updateProduct(spuId, data) {
+    return _axios({
+      method: 'put',
+      url: `v1/pms-spu-info/updateDetail/${spuId}`,
+      data
+    })
+  }
+
   async getProductDetail(id) {
     return _axios({
       method: 'get',
       url: `v1/pms-spu-info/detail/${id}`
+    })
+  }
+
+  async deleteProduct(id) {
+    return _axios({
+      method: 'delete',
+      url: `v1/pms-spu-info/${id}`
     })
   }
 

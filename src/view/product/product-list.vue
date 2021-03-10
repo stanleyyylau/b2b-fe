@@ -63,7 +63,9 @@
             >
               Edit
             </el-button>
-            <el-button plain type="danger" size="mini">Delete</el-button>
+            <el-button plain type="danger" size="mini"
+                       @click.native.prevent.stop="handleDelete(scope.row.id)"
+            >Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -82,6 +84,22 @@ export default {
     await this.getProducts()
   },
   methods: {
+    handleDelete(id) {
+      this.$confirm('此操作将永久删除该产品, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(async () => {
+        const res = await product.deleteProduct(id)
+        if (res.code < window.MAX_SUCCESS_CODE) {
+          this.getProducts()
+          this.$message({
+            type: 'success',
+            message: `${res.message}`,
+          })
+        }
+      })
+    },
     async getProducts() {
       try {
         const products = await product.getProducts()
