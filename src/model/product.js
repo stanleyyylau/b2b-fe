@@ -27,6 +27,14 @@ class Product {
     })
   }
 
+  async createFileForSpu(data) {
+    return _axios({
+      method: 'post',
+      url: 'v1/pms-product-files',
+      data
+    })
+  }
+
   async deleteProduct(id) {
     return _axios({
       method: 'delete',

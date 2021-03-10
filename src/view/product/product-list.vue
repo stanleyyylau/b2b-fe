@@ -63,6 +63,11 @@
             >
               Edit
             </el-button>
+            <el-button plain type="primary" size="mini"
+                       @click.native.prevent.stop="handleDrawer(scope.row.id)"
+            >
+              Files
+            </el-button>
             <el-button plain type="danger" size="mini"
                        @click.native.prevent.stop="handleDelete(scope.row.id)"
             >Delete</el-button>
@@ -71,6 +76,33 @@
       </el-table>
     </div>
 
+    <!--file drawer-->
+    <el-drawer
+      title="产品关联的文件"
+      :visible.sync="showDrawer"
+      direction="rtl"
+      :before-close="handleClose">
+      <div>
+        <input ref="fileInput" type="file" :disabled="isFileUploading" />
+        <button @click="handleUpload" :disabled="isFileUploading">
+          {{ isFileUploading ? "uploading" : "upload" }}
+        </button>
+      </div>
+      <el-table
+        :data="fileList"
+        style="width: 100%">
+        <el-table-column
+          prop="fileName"
+          label="文件名"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="fileUrl"
+          label="下载地址"
+          width="180">
+        </el-table-column>
+      </el-table>
+    </el-drawer>
   </div>
 </template>
 
@@ -112,10 +144,52 @@ export default {
     },
     handleEdit(productId) {
       this.$router.push({ path: '/product/edit', query: { id: productId } })
-    }
+    },
+    handleDrawer(productId) {
+      this.showDrawer = true
+      this.showDrawerForSpuId = productId
+      console.log(productId)
+    },
+    getFileList() {
+      console.log(this.showDrawerForSpuId)
+    },
+    handleChange() {
+      console.log('file list here')
+      console.log(this.$refs.upload.fileList)
+    },
+    handleUpload() {
+      const { files } = this.$refs.fileInput
+      console.log(files)
+      this.sendRequest(files[0])
+    },
+    sendRequest(file) {
+      const self = this
+      self.isFileUploading = true
+      console.log('sending request')
+      return this.$axios({
+        method: 'post',
+        url: '/cms/file',
+        data: {
+          [file.name]: file
+        },
+      })
+        .then(async res => {
+          console.log('result:', res)
+          const fileRes = await product.createFileForSpu({
+            spu_id: self.showDrawerForSpuId,
+            file_name: res[0].key,
+            file_url: res[0].url
+          })
+          self.isFileUploading = false
+          self.getFileList()
+        })
+    },
   },
   data() {
     return {
+      showDrawer: false,
+      showDrawerForSpuId: '',
+      isFileUploading: false,
       tableColumn: [
         {
           prop: 'spu_name',
@@ -150,6 +224,16 @@ export default {
       ],
       showEdit: false,
       editBookID: 1,
+      fileList: [{
+        fileName: 'a16 文件',
+        fileUrl: 'http://www.baidu.com/a16.zip'
+      }, {
+        fileName: 'a17 文件',
+        fileUrl: 'http://www.baidu.com/a16.zip'
+      }, {
+        fileName: 'a18 文件',
+        fileUrl: 'http://www.baidu.com/a16.zip'
+      }]
     }
   }
 }
