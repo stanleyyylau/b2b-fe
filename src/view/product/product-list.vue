@@ -97,9 +97,11 @@
           width="180">
         </el-table-column>
         <el-table-column
-          prop="fileUrl"
-          label="下载地址"
+          label="下载"
           width="180">
+          <template slot-scope="scope">
+            <a :href="scope.row.fileUrl" target="_blank">downlnoad</a>
+          </template>
         </el-table-column>
       </el-table>
     </el-drawer>
@@ -148,10 +150,16 @@ export default {
     handleDrawer(productId) {
       this.showDrawer = true
       this.showDrawerForSpuId = productId
+      this.getFileList()
       console.log(productId)
     },
-    getFileList() {
+    async getFileList() {
       console.log(this.showDrawerForSpuId)
+      const res = await product.getFileBySpuId(this.showDrawerForSpuId)
+      this.fileList = res.map(item => ({
+        fileName: item.file_name,
+        fileUrl: item.file_url
+      }))
     },
     handleChange() {
       console.log('file list here')

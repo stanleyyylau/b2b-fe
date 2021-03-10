@@ -35,6 +35,13 @@ class Product {
     })
   }
 
+  async getFileBySpuId(spuId) {
+    return _axios({
+      method: 'get',
+      url: `v1/pms-product-files/bySpuId/${spuId}`,
+    })
+  }
+
   async deleteProduct(id) {
     return _axios({
       method: 'delete',
