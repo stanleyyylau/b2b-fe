@@ -45,3 +45,14 @@ jobs:
           npm run build --if-present # build the project
 #       - name: test
 #         run: npm run test:unit # run the tests
+  deploy-github-pages:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: vue to github pages
+        uses: xRealNeon/VuePagesAction@1.0.0
+        with:
+          username: 'anton-studio'
+          reponame: 'b2b-fe'
+          token: ${{ secrets.GITHUB_TOKEN }}
+    
