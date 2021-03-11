@@ -50,9 +50,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: vue to github pages
-        uses: xRealNeon/VuePagesAction@1.0.0
+        uses: netlify/actions/cli@master 
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         with:
-          username: 'anton-studio'
-          reponame: 'b2b-fe'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          args: deploy --dir=dist --prod
+          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
     
