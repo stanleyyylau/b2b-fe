@@ -183,7 +183,7 @@ export default {
       })
         .then(async res => {
           console.log('result:', res)
-          const fileRes = await product.createFileForSpu({
+          await product.createFileForSpu({
             spu_id: self.showDrawerForSpuId,
             file_name: res[0].key,
             file_url: res[0].url

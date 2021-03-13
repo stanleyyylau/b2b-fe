@@ -1,13 +1,15 @@
 import adminConfig from './admin'
-import bookConfig from './book' // 引入图书管理路由文件
-import clientConfig from './product'
+import productRouter from './product'
+import clientPoolRouter from './clientPool'
+import clientRouter from './client'
+import contractRouter from './contract'
 import pluginsConfig from './plugin'
 import Utils from '@/lin/util/util'
 
 // eslint-disable-next-line import/no-mutable-exports
 let homeRouter = [
   {
-    title: '林间有风',
+    title: '仪表盘',
     type: 'view',
     name: Symbol('about'),
     route: '/about',
@@ -45,8 +47,10 @@ let homeRouter = [
     inNav: false,
     icon: 'iconfont icon-rizhiguanli',
   },
-  bookConfig,
-  clientConfig,
+  clientPoolRouter,
+  clientRouter,
+  contractRouter,
+  productRouter,
   adminConfig,
 ]
 

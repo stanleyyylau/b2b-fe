@@ -1,6 +1,10 @@
 <template>
   <div class="app-sidebar">
-    <div class="logo" v-if="!elMenuCollapse"><img src="../../assets/image/logo.png" alt="" /></div>
+    <div class="logo" v-if="!elMenuCollapse">
+      <router-link to="/">
+        <img src="../../assets/image/logo.png" alt="" />
+      </router-link>
+    </div>
     <div class="mobile-logo" v-else><img src="../../assets/image/mobile-logo.png" alt="" /></div>
     <div style="margin-bottom:50px">
       <div v-if="showSidebarSearch" style="margin-top: 15px">
@@ -261,7 +265,7 @@ export default {
     z-index: 99;
 
     img {
-      width: 120px;
+      width: 150px;
       transition: all 0.3s linear;
     }
   }
