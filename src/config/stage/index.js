@@ -3,7 +3,7 @@ import productRouter from './product'
 import clientPoolRouter from './clientPool'
 import clientRouter from './client'
 import contractRouter from './contract'
-import pluginsConfig from './plugin'
+// import pluginsConfig from './plugin'
 import Utils from '@/lin/util/util'
 
 // eslint-disable-next-line import/no-mutable-exports
@@ -54,7 +54,8 @@ let homeRouter = [
   adminConfig,
 ]
 
-const plugins = [...pluginsConfig]
+// const plugins = [...pluginsConfig]
+const plugins = []
 
 // 筛除已经被添加的插件
 function filterPlugin(data) {
