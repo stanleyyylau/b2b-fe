@@ -42,13 +42,15 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: ls -la
-      - name: Copy folder content recursively to remote
-        uses: garygrossgarten/github-action-scp@release
+      - name: Deploy static to Tencent CloudBase
+        id: deployStatic
+        uses: TencentCloudBase/cloudbase-action@v1
         with:
-          local: dist
-          remote: /sites/b2b.antoncloud.xyz
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.PASSWORD }}
-          rmRemote: true
+          # 云开发的访问密钥 secretId 和 secretKey
+          secretId: ${{ secrets.SECRET_ID }}
+          secretKey: ${{ secrets.SECRET_KEY }}
+          # 云开发的环境id
+          envId: ${{ secrets.ENV_ID }}
+          # Github 项目静态文件的路径
+          staticSrcPath: dist
 
