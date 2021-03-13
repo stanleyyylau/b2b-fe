@@ -46,7 +46,7 @@ jobs:
         uses: garygrossgarten/github-action-scp@release
         with:
           local: dist
-          remote: /var/www/b2b.antoncloud.xyz
+          remote: /sites/b2b.antoncloud.xyz
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.PASSWORD }}
