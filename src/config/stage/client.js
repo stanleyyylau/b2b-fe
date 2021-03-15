@@ -26,6 +26,15 @@ const clientRouter = {
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
     },
+    {
+      title: '编辑客户',
+      type: 'view',
+      name: 'MyClients',
+      route: '/client/edit',
+      filePath: 'view/client/client-edit.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    }
   ],
 }
 

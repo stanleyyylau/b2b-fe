@@ -3,7 +3,7 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header">
-        <div class="title">新增客户</div>
+        <div class="title">编辑客户</div>
       </div>
 
       <el-row>
@@ -114,7 +114,7 @@
               <el-switch v-model="form.isInPublicSea"></el-switch>
             </el-form-item>
             <el-form-item style="padding-bottom: 50px">
-              <el-button type="primary" v-on:click="handleClientAdd" :loading="loading">确定新增客户</el-button>
+              <el-button type="primary" v-on:click="handleClientUpdate" :loading="loading">确定更新客户</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -131,6 +131,11 @@ import client from '@/model/client'
 export default {
   components: {},
   created() {
+    const clientId = Number(this.$router.history.current.query.id)
+    console.log(clientId)
+    this.clientId = clientId
+    console.log('#### about to init data ####')
+    this.initDataForEdit(clientId)
     this.setUPSpuData()
   },
   methods: {
@@ -139,7 +144,7 @@ export default {
       console.log('generating client code')
       return String(new Date().getTime())
     },
-    async handleClientAdd() {
+    async handleClientUpdate() {
       this.loading = true
       console.log('this form is', this.form)
       const transformedForm = {
@@ -152,7 +157,7 @@ export default {
         }))
       }
       console.log('trnsform form is', transformedForm)
-      await client.createClient(transformedForm)
+      await client.updateClient(transformedForm, this.clientId)
       this.loading = false
       this.$router.back()
     },
@@ -167,6 +172,21 @@ export default {
         }
       ]
       this.form.interestProducts = newIp
+    },
+    async initDataForEdit(clientId) {
+      const res = await client.getClientDetail(clientId)
+      this.form = {
+        ...res,
+        isInPublicSea: res.is_in_public_sea,
+        contact_methods: JSON.parse(res.contact_methods),
+        interestProducts: res.interest_products.map(productItem => ({
+          spuId: String(productItem.product_id),
+          num: productItem.num,
+          notes: productItem.notes
+        }))
+      }
+      console.log('res is', res)
+      console.log(this.form)
     },
     async setUPSpuData() {
       const res = await product.getProducts()
@@ -272,15 +292,15 @@ export default {
         source: '阿里',
         isInPublicSea: false,
         interestProducts: [
-          // {
-          //   spuId: null,
-          //   num: null,
-          //   notes: null
-          // }
+          {
+            spuId: null,
+            num: null,
+            notes: null
+          }
         ]
       },
     }
-  },
+  }
 }
 
 </script>
