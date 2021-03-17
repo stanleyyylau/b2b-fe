@@ -37,14 +37,26 @@
         </el-table-column>
       </el-table>
     </div>
+
+    <file-attachment
+      title="客户关联的文件"
+      :visible="showDrawerForClientId !== 0"
+      @close="handleClose"
+      :fileList="fileList"
+      @uploaded="handleUploaded"
+    />
   </div>
 </template>
 
 <script>
 import client from '@/model/client'
+import product from '@/model/product'
+import fileAttachment from '@/component/common/file-attachment'
 
 export default {
-  components: {},
+  components: {
+    fileAttachment,
+  },
   created() {
     this.getClients()
   },
@@ -93,9 +105,35 @@ export default {
     handleEdit(id) {
       this.$router.push({ path: '/client/edit', query: { id } })
     },
+    handleDrawer(id) {
+      this.showDrawerForClientId = id
+      this.getFileList()
+    },
+    async handleUploaded(res) {
+      console.log('uploaded result is', res)
+      await product.createFileForClient({
+        client_id: this.showDrawerForClientId,
+        file_name: res[0].key,
+        file_url: res[0].url,
+      })
+      await this.getFileList()
+    },
+    handleClose() {
+      this.showDrawerForClientId = 0
+    },
+    async getFileList() {
+      const res = await client.getFileByClientId(this.showDrawerForClientId)
+      this.fileList = res.map(item => ({
+        id: item.id,
+        fileName: item.file_name,
+        fileUrl: item.file_url,
+      }))
+    },
   },
   data() {
     return {
+      showDrawerForClientId: 0,
+      fileList: [],
       clients: [],
     }
   },
