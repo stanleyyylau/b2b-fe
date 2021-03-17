@@ -61,6 +61,21 @@ class Client {
       url: `v1/cms-client-files/byClientId/${showDrawerForClientId}`,
     })
   }
+
+  async addFollowLog(data) {
+    return _axios({
+      method: 'post',
+      url: 'v1/cms-client-follow-log',
+      data,
+    })
+  }
+
+  async listFollowLog(id) {
+    return _axios({
+      method: 'get',
+      url: `v1/cms-client-follow-log/listByClientId/${id}`,
+    })
+  }
 }
 
 export default new Client()
