@@ -2,7 +2,7 @@
   <div>
     <!-- 列表页面 -->
     <div class="container">
-      <div class="header"><div class="title">新增合同</div></div>
+      <div class="header"><div class="title">编辑合同</div></div>
     </div>
 
     <el-row>

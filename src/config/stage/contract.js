@@ -27,6 +27,15 @@ const contractRouter = {
       icon: 'iconfont icon-tushuguanli',
     },
     {
+      title: '编辑合同',
+      type: 'view',
+      name: 'ContractList',
+      route: '/contract/edit',
+      filePath: 'view/contract/contract-edit.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    },
+    {
       title: '待审核合同',
       type: 'view',
       name: 'ContractPending',
@@ -34,7 +43,7 @@ const contractRouter = {
       filePath: 'view/contract/contract-pending.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
-    }
+    },
   ],
 }
 
