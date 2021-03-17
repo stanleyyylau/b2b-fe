@@ -37,7 +37,7 @@ class Client {
     return _axios({
       method: 'put',
       url: `v1/cms-client-info/${clientId}`,
-      data: transformedForm
+      data: transformedForm,
     })
   }
 
@@ -45,6 +45,20 @@ class Client {
     return _axios({
       method: 'get',
       url: 'v1/cms-client-info/listSea',
+    })
+  }
+
+  async acquireClient(clientId) {
+    return _axios({
+      method: 'get',
+      url: `v1/cms-client-info/acquireClient/${clientId}`,
+    })
+  }
+
+  async getFileByClientId(showDrawerForClientId) {
+    return _axios({
+      method: 'get',
+      url: `v1/cms-client-files/byClientId/${showDrawerForClientId}`,
     })
   }
 }

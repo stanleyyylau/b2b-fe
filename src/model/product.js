@@ -16,14 +16,14 @@ class Product {
     return _axios({
       method: 'put',
       url: `v1/pms-spu-info/updateDetail/${spuId}`,
-      data
+      data,
     })
   }
 
   async getProductDetail(id) {
     return _axios({
       method: 'get',
-      url: `v1/pms-spu-info/detail/${id}`
+      url: `v1/pms-spu-info/detail/${id}`,
     })
   }
 
@@ -31,7 +31,7 @@ class Product {
     return _axios({
       method: 'post',
       url: 'v1/pms-product-files',
-      data
+      data,
     })
   }
 
@@ -45,7 +45,7 @@ class Product {
   async deleteProduct(id) {
     return _axios({
       method: 'delete',
-      url: `v1/pms-spu-info/${id}`
+      url: `v1/pms-spu-info/${id}`,
     })
   }
 
@@ -81,6 +81,14 @@ class Product {
       method: 'get',
       url: 'v1/pms-spu-info/list',
       handleError: true,
+    })
+  }
+
+  async createFileForClient(data) {
+    return _axios({
+      method: 'post',
+      url: 'v1/cms-client-files',
+      data,
     })
   }
 }

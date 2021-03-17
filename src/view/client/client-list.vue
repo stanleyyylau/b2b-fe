@@ -3,81 +3,56 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header"><div class="title">我的客户</div></div>
-      <el-table
-        :data="clients"
-        style="width: 100%">
-        <el-table-column
-          prop="country"
-          label="国家"
-          width="150">
-        </el-table-column>
-        <el-table-column
-          prop="client_name"
-          label="客户名"
-          width="150">
-        </el-table-column>
-        <el-table-column
-          prop="company_name"
-          label="公司名"
-          width="150">
-        </el-table-column>
-        <el-table-column
-          label="联系方式"
-          width="250">
+      <el-table :data="clients" style="width: 100%">
+        <el-table-column prop="country" label="国家" width="150"> </el-table-column>
+        <el-table-column prop="client_name" label="客户名" width="150"> </el-table-column>
+        <el-table-column prop="company_name" label="公司名" width="150"> </el-table-column>
+        <el-table-column label="联系方式" width="250">
           <template slot-scope="scope">
             <ul>
               <li v-for="(item, index) in scope.row.contact_methods" :key="index">
-                {{ item.method }} : {{item.detail}}
+                {{ item.method }} : {{ item.detail }}
               </li>
             </ul>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="client_level"
-          label="客户等级"
-          width="120">
-        </el-table-column>
-        <el-table-column
-          prop="industry"
-          label="客户行业"
-          width="120">
-        </el-table-column>
-        <el-table-column
-          prop="source"
-          label="来源"
-          width="120">
-        </el-table-column>
-        <el-table-column
-          fixed="right"
-          label="Operations"
-          width="170">
+        <el-table-column prop="client_level" label="客户等级" width="120"> </el-table-column>
+        <el-table-column prop="industry" label="客户行业" width="120"> </el-table-column>
+        <el-table-column prop="source" label="来源" width="120"> </el-table-column>
+        <el-table-column fixed="right" label="Operations" width="170">
           <template slot-scope="scope">
-            <el-button plain type="primary" size="mini"
-                       @click.native.prevent.stop="handleEdit(scope.row.id)"
-            >
+            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
               Edit
             </el-button>
-            <el-button plain type="primary" size="mini"
-                       @click.native.prevent.stop="handleDrawer(scope.row.id)"
-            >
+            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
               Files
             </el-button>
-            <el-button plain type="danger" size="mini"
-                       @click.native.prevent.stop="handleDelete(scope.row.id)"
-            >Delete</el-button>
+            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope.row.id)"
+              >Delete</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
     </div>
+
+    <file-attachment
+      title="客户关联的文件"
+      :visible="showDrawerForClientId !== 0"
+      @close="handleClose"
+      :fileList="fileList"
+      @uploaded="handleUploaded"
+    />
   </div>
 </template>
 
 <script>
-
 import client from '@/model/client'
+import product from '@/model/product'
+import fileAttachment from '@/component/common/file-attachment'
 
 export default {
   components: {
+    fileAttachment,
   },
   created() {
     this.getClients()
@@ -87,7 +62,7 @@ export default {
       const res = await client.list()
       this.clients = res.map(item => ({
         ...item,
-        contact_methods: JSON.parse(item.contact_methods)
+        contact_methods: JSON.parse(item.contact_methods),
       }))
       console.log('res is', res)
     },
@@ -110,20 +85,56 @@ export default {
     },
     handleEdit(id) {
       this.$router.push({ path: '/client/edit', query: { id } })
-    }
+    },
+    handleDrawer(id) {
+      this.showDrawerForClientId = id
+      this.getFileList()
+    },
+    async handleUploaded(res) {
+      console.log('uploaded result is', res)
+      await product.createFileForClient({
+        client_id: this.showDrawerForClientId,
+        file_name: res[0].key,
+        file_url: res[0].url,
+      })
+      await this.getFileList()
+    },
+    handleClose() {
+      this.showDrawerForClientId = 0
+    },
+    async getFileList() {
+      const res = await client.getFileByClientId(this.showDrawerForClientId)
+      this.fileList = res.map(item => ({
+        id: item.id,
+        fileName: item.file_name,
+        fileUrl: item.file_url,
+      }))
+    },
   },
   data() {
     return {
-      clients: []
+      showDrawerForClientId: 0,
+      clients: [],
+      fileList: [
+        {
+          fileName: 'a16 文件',
+          fileUrl: 'http://www.baidu.com/a16.zip',
+        },
+        {
+          fileName: 'a17 文件',
+          fileUrl: 'http://www.baidu.com/a16.zip',
+        },
+        {
+          fileName: 'a18 文件',
+          fileUrl: 'http://www.baidu.com/a16.zip',
+        },
+      ],
     }
-  }
+  },
 }
-
 </script>
 
-
 <style lang="scss" scoped>
-
 .container {
   padding: 0 30px;
 
@@ -147,5 +158,4 @@ export default {
     margin: 20px;
   }
 }
-
 </style>
