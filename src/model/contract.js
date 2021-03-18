@@ -25,6 +25,21 @@ class Contract {
       url: `v1/ims-contract/${id}`,
     })
   }
+
+  async getDetail(editId) {
+    return _axios({
+      method: 'get',
+      url: `v1/ims-contract/${editId}`,
+    })
+  }
+
+  async update(editId, data) {
+    return _axios({
+      method: 'put',
+      url: `v1/ims-contract/${editId}`,
+      data,
+    })
+  }
 }
 
 export default new Contract()

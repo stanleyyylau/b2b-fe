@@ -73,7 +73,7 @@
             </el-card>
           </el-form-item>
           <el-form-item style="padding-bottom: 50px">
-            <el-button type="primary" v-on:click="handleContractAdd" :loading="loading">确定新增合同</el-button>
+            <el-button type="primary" v-on:click="handleContractAdd" :loading="loading">确定修改合同</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -91,9 +91,21 @@ export default {
   async created() {
     await this.getClients()
     await this.getSpus()
+    const contractId = this.$router.history.current.query.id
+    this.editId = contractId
+    await this.initForEdit()
     console.log('finish getting client')
   },
   methods: {
+    async initForEdit() {
+      const res = await contract.getDetail(this.editId)
+      this.form = {
+        ...res,
+        spuIds: res.spu_ids.map(id => ({
+          spuId: id,
+        })),
+      }
+    },
     async handleContractAdd() {
       this.loading = true
       const data = {
@@ -101,7 +113,8 @@ export default {
         spu_ids: this.form.spuIds.map(item => item.spuId),
       }
 
-      await contract.create(data)
+      console.log('dorm is ', data)
+      await contract.update(this.editId, data)
       this.loading = false
       this.$router.back()
       console.log('data to send to backend is', data)
@@ -127,6 +140,7 @@ export default {
   },
   data() {
     return {
+      editId: 0,
       loading: false,
       spuOptions: [],
       clientOptions: [],
