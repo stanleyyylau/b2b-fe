@@ -91,6 +91,13 @@ class Product {
       data,
     })
   }
+
+  async getProductDetailsForPrint(idsList) {
+    return _axios({
+      method: 'get',
+      url: `v1/pms-spu-info/detailForPrint?spus=${idsList.join(',')}`,
+    })
+  }
 }
 
 export default new Product()

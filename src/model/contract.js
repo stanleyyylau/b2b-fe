@@ -40,6 +40,36 @@ class Contract {
       data,
     })
   }
+
+  async getTemplateById(id) {
+    return _axios({
+      method: 'get',
+      url: `v1/ims-print-template/${id}`,
+    })
+  }
+
+  async listTpl() {
+    return _axios({
+      method: 'get',
+      url: 'v1/ims-print-template/list',
+    })
+  }
+
+  async editTpl(id, data) {
+    return _axios({
+      method: 'put',
+      url: `v1/ims-print-template/${id}`,
+      data,
+    })
+  }
+
+  async createTpl(data) {
+    return _axios({
+      method: 'post',
+      url: 'v1/ims-print-template',
+      data,
+    })
+  }
 }
 
 export default new Contract()

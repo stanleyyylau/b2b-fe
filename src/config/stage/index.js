@@ -3,6 +3,7 @@ import productRouter from './product'
 import clientPoolRouter from './clientPool'
 import clientRouter from './client'
 import contractRouter from './contract'
+import companyRouter from '@/config/stage/company'
 // import pluginsConfig from './plugin'
 import Utils from '@/lin/util/util'
 
@@ -47,10 +48,21 @@ let homeRouter = [
     inNav: false,
     icon: 'iconfont icon-rizhiguanli',
   },
+  {
+    title: '打印PDF',
+    type: 'view',
+    name: Symbol('download'),
+    route: '/download',
+    filePath: 'view/print/print-download.vue',
+    inNav: false,
+    icon: 'iconfont icon-rizhiguanli',
+    order: 100,
+  },
   clientPoolRouter,
   clientRouter,
   contractRouter,
   productRouter,
+  companyRouter,
   adminConfig,
 ]
 

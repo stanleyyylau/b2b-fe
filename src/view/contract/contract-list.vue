@@ -5,27 +5,39 @@
       <div class="header"><div class="title">我的合同</div></div>
 
       <!-- 表格 -->
-      <lin-table
-        :tableColumn="tableColumn"
-        :tableData="tableData"
-        :operate="operate"
-        @handleEdit="handleEdit"
-        @handleDelete="handleDelete"
-        @row-click="rowClick"
-        v-loading="loading"
-      ></lin-table>
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="contract_time" label="contract_time" width="150"> </el-table-column>
+        <el-table-column prop="delivery_time" label="delivery_time" width="150"> </el-table-column>
+        <el-table-column prop="total_amount" label="total_amount" width="150"> </el-table-column>
+        <el-table-column prop="actual_delivery_fee" label="actual_delivery_fee" width="150"> </el-table-column>
+        <el-table-column prop="payment_method" label="payment_method" width="150"> </el-table-column>
+        <el-table-column prop="payment_status" label="payment_status" width="150"> </el-table-column>
+        <el-table-column prop="raw_cost" label="raw_cost" width="150"> </el-table-column>
+        <el-table-column prop="review_status" label="review_status" width="150"> </el-table-column>
+        <el-table-column prop="client_id" label="client_id" width="150"> </el-table-column>
+        <el-table-column fixed="right" label="Operations" width="170">
+          <template slot-scope="scope">
+            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
+              Edit
+            </el-button>
+            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handlePrint(scope.row.id)">
+              打印
+            </el-button>
+            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope)"
+              >Delete</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 
 <script>
-import LinTable from '@/component/base/table/lin-table'
 import contract from '@/model/contract'
 
 export default {
-  components: {
-    LinTable,
-  },
+  components: {},
   async created() {
     this.loading = true
     await this.getContract()
@@ -41,6 +53,14 @@ export default {
     this.loading = false
   },
   methods: {
+    handlePrint(id) {
+      this.$router.push({
+        path: '/download',
+        query: {
+          contractId: id,
+        },
+      })
+    },
     handleEdit(val) {
       console.log('val', val)
       const editBookID = val.row.id
