@@ -4,6 +4,9 @@
     <div class="container">
       <div class="header">
         <div class="title">属性分组</div>
+        <div class="operation">
+          <el-button type="primary" @click.native.prevent.stop="addAttrGroup">新增属性分组</el-button>
+        </div>
       </div>
       <lin-table
         :tableColumn="tableColumn"
@@ -12,21 +15,35 @@
         @goToGroupEditPage="handleAddChild"
         @handleEdit="handleEdit"
         @handleDelete="handleDelete"
-        @row-click="rowClick"
+        @selection-change="rowClick"
         v-loading="loading"
       ></lin-table>
     </div>
+
+    <!--new group dialog-->
+    <el-dialog title="新增属性分组" :visible.sync="showAttrGroup">
+      <el-form :model="form">
+        <el-form-item label="属性分组名">
+          <el-input v-model="form.newGroupName" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showAttrGroup = false">Cancel</el-button>
+        <el-button :disabled="form.newGroupName === ''" :loading="loading" type="primary" @click="handleGroupAdd"
+          >Confirm</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-
 import attribute from '@/model/attribute'
 import LinTable from '@/component/base/table/lin-table'
 
 export default {
   components: {
-    LinTable
+    LinTable,
   },
   async created() {
     await this.getAttrGroups()
@@ -35,6 +52,37 @@ export default {
   methods: {
     goBack() {
       this.$router.back()
+    },
+    addAttrGroup() {
+      this.showAttrGroup = true
+    },
+    rowClick(val) {
+      console.log('row click', val)
+    },
+    handleEdit(scope) {
+      this.$router.push({
+        path: '/attr/listByParent',
+        query: {
+          id: scope.row.id,
+        },
+      })
+    },
+    async handleDelete(scope) {
+      const { id: groupId } = scope.row
+      this.$confirm('此操作将永久删除该属性组, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(async () => {
+        const res = await attribute.deleteAttrGroup(groupId)
+        if (res.code < window.MAX_SUCCESS_CODE) {
+          this.getAttrGroups()
+          this.$message({
+            type: 'success',
+            message: `${res.message}`,
+          })
+        }
+      })
     },
     async getAttrGroups() {
       try {
@@ -50,18 +98,40 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    handleAddChild() {
-      this.$router.push('/attr/add')
-    }
+    handleAddChild(val) {
+      this.$router.push({
+        path: '/attr/add',
+        query: {
+          groupId: val.row.id,
+        },
+      })
+    },
+    async handleGroupAdd() {
+      this.loading = true
+      const res = await attribute.createGroup(this.form.newGroupName)
+      this.$message({
+        type: 'success',
+        message: `${res.message}`,
+      })
+      this.form.newGroupName = ''
+      this.loading = false
+      this.showAttrGroup = false
+      this.getAttrGroups()
+    },
   },
   data() {
     return {
+      loading: false,
+      showAttrGroup: false,
       tableColumn: [
         {
           prop: 'attr_group_name',
           label: '属性组名称',
         },
       ],
+      form: {
+        newGroupName: '',
+      },
       tableData: [],
       operate: [
         {
@@ -70,7 +140,7 @@ export default {
           type: 'primary',
         },
         {
-          name: '编辑',
+          name: '浏览',
           func: 'handleEdit',
           type: 'primary',
         },
@@ -86,12 +156,9 @@ export default {
     }
   },
 }
-
 </script>
 
-
 <style lang="scss" scoped>
-
 .container {
   padding: 0 30px;
 
@@ -115,5 +182,4 @@ export default {
     margin: 20px;
   }
 }
-
 </style>

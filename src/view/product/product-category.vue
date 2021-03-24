@@ -5,10 +5,7 @@
       <div class="header">
         <div class="title">产品分类</div>
         <div class="operation">
-          <el-button
-            type="primary"
-            @click.native.prevent.stop="addCategory(0)"
-          >新增大类目</el-button>
+          <el-button type="primary" @click.native.prevent.stop="addCategory(0)">新增大类目</el-button>
         </div>
       </div>
       <lin-table
@@ -17,16 +14,14 @@
         :operate="operate"
         @goToGroupEditPage="handleAddChild"
         @handleDelete="handleDelete"
-        @row-click="rowClick"
+        @handleView="rowClick"
         v-loading="loading"
       ></lin-table>
     </div>
-
   </div>
 </template>
 
 <script>
-
 import category from '@/model/category'
 import LinTable from '@/component/base/table/lin-table'
 
@@ -39,6 +34,10 @@ export default {
     this.loading = false
   },
   methods: {
+    async rowClick(val) {
+      console.log('row clicked', val)
+      this.$router.push({ path: '/productCat/sublist', query: { parentId: val.row.id } })
+    },
     async getTopLevelCates() {
       try {
         const cates = await category.getTopLevelCategories()
@@ -54,13 +53,11 @@ export default {
     },
     handleAddChild(val) {
       this.$router.push({ path: '/productCat/add', query: { parentId: val.row.id } })
-    }
+    },
   },
   data() {
     return {
-      tableColumn: [
-        { prop: 'name', label: '分类名称' },
-      ],
+      tableColumn: [{ prop: 'name', label: '分类名称' }],
       tableData: [],
       operate: [
         {
@@ -69,8 +66,8 @@ export default {
           type: 'primary',
         },
         {
-          name: '编辑',
-          func: 'handleEdit',
+          name: '浏览',
+          func: 'handleView',
           type: 'primary',
         },
         {
@@ -85,12 +82,9 @@ export default {
     }
   },
 }
-
 </script>
 
-
 <style lang="scss" scoped>
-
 .container {
   padding: 0 30px;
 
@@ -114,5 +108,4 @@ export default {
     margin: 20px;
   }
 }
-
 </style>

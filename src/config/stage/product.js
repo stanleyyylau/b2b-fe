@@ -45,6 +45,15 @@ const productRouter = {
       icon: 'iconfont icon-tushuguanli',
     },
     {
+      title: '产品二级分类',
+      type: 'view',
+      name: 'ProductCats',
+      route: '/productCat/sublist',
+      filePath: 'view/product/product-category-sub.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    },
+    {
       title: '新增产品分类',
       type: 'view',
       name: 'AddProductCats',
@@ -70,7 +79,16 @@ const productRouter = {
       filePath: 'view/product/attr-create.vue',
       inNav: false,
       icon: 'iconfont icon-tushuguanli',
-    }
+    },
+    {
+      title: '产品属性',
+      type: 'view',
+      name: 'ProductAttrByParent',
+      route: '/attr/listByParent',
+      filePath: 'view/product/attr-list-parent.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    },
   ],
 }
 

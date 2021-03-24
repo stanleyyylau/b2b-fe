@@ -11,7 +11,7 @@ class Category {
       name: catName,
       parent_cid: pid,
       show_status: 1,
-      cat_level: Number(pid) === 0 ? 0 : 1
+      cat_level: Number(pid) === 0 ? 0 : 1,
     }
     return _axios({
       method: 'post',
@@ -54,6 +54,32 @@ class Category {
       handleError: true,
     })
     return cates.filter(cat => cat.cat_level === 1)
+  }
+
+  async getByParentId(parentId) {
+    const res = await this.getSecondLevelCategories()
+    return res.filter(cate => cate.parent_cid === parentId)
+  }
+
+  async deleteById(id) {
+    const res = await _delete(`v1/pms-category/${id}`)
+    return res
+  }
+
+  async getById(id) {
+    return get(`v1/pms-category/${id}`)
+  }
+
+  async updateById(id, name) {
+    return _axios({
+      method: 'put',
+      url: `v1/pms-category/${id}`,
+      handleError: true,
+      data: {
+        id,
+        name,
+      },
+    })
   }
 }
 

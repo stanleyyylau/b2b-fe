@@ -13,18 +13,15 @@
             </el-form-item>
             <el-form-item label="上级分类" prop="parentCatId">
               <el-select v-model="form.parentCatId" placeholder="选择上级分类">
-                <el-option
-                  v-for="item in catOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                <el-option v-for="item in catOptions" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item class="submit">
-              <el-button type="primary" @click.native.prevent.stop="handleAddCategory('form')" :loading="loading">确认添加
+              <el-button type="primary" @click.native.prevent.stop="handleAddCategory('form')" :loading="loading"
+                >确认添加
               </el-button>
-              <el-button @click="resetForm('form')">重 置</el-button>
+              <!--              <el-button @click="resetForm('form')">重 置</el-button>-->
               <el-button @click="goBack">返回</el-button>
             </el-form-item>
           </el-form>
@@ -35,7 +32,6 @@
 </template>
 
 <script>
-
 import category from '@/model/category'
 
 export default {
@@ -55,7 +51,7 @@ export default {
     },
     findLabelByCateId(id) {
       console.log(id, this.catOptions)
-      const match = this.catOptions.filter(cate => cate.value === id)
+      const match = this.catOptions.filter(cate => cate.value === Number(id))
       if (match.length > 0) {
         return match[0].label
       }
@@ -68,7 +64,7 @@ export default {
         // transform to cat options
         const optionsFromServer = cates.map(cat => ({
           value: cat.id,
-          label: cat.name
+          label: cat.name,
         }))
         console.log('options from server')
         console.log(optionsFromServer)
@@ -137,12 +133,9 @@ export default {
     }
   },
 }
-
 </script>
 
-
 <style lang="scss" scoped>
-
 .container {
   padding: 0 30px;
 
@@ -166,5 +159,4 @@ export default {
     margin: 20px;
   }
 }
-
 </style>

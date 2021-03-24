@@ -110,7 +110,7 @@ export default {
       rules: {
         minWidth: 100,
         minHeight: 100,
-        maxSize: 5,
+        maxSize: 99999999,
       },
       rules2: {
         minWidth: 100,

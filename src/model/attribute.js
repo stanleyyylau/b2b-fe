@@ -27,8 +27,8 @@ class Attribute {
     return res
   }
 
-  async deleteBook(id) {
-    const res = await _delete(`v1/book/${id}`)
+  async delete(id) {
+    const res = await _delete(`v1/pms-attr/${id}`)
     return res
   }
 
@@ -45,6 +45,33 @@ class Attribute {
       method: 'get',
       url: `v1/pms-attr/groupId/${groupId}`,
       handleError: true,
+    })
+  }
+
+  async getAttrsById(id) {
+    return _axios({
+      method: 'get',
+      url: `v1/pms-attr/${id}`,
+      handleError: true,
+    })
+  }
+
+  async deleteAttrGroup(id) {
+    return _axios({
+      method: 'delete',
+      url: `v1/pms-attr-group/${id}`,
+      handleError: true,
+    })
+  }
+
+  async createGroup(name) {
+    return _axios({
+      method: 'post',
+      url: 'v1/pms-attr-group',
+      handleError: true,
+      data: {
+        attr_group_name: name,
+      },
     })
   }
 }
