@@ -14,6 +14,12 @@
             <el-form-item label="标题" prop="spu_title">
               <el-input size="medium" placeholder="标题" v-model="form.spu_title"></el-input>
             </el-form-item>
+            <el-form-item label="证书">
+              <el-select multiple v-model="form.certificates" placeholder="选择证书">
+                <el-option v-for="item in certOptions" :key="item.label" :label="item.label" :value="item.label">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <el-form-item label="描述" prop="spu_description">
               <el-input size="medium" placeholder="描述" v-model="form.spu_description"></el-input>
             </el-form-item>
@@ -91,29 +97,71 @@
                         </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="sku" label="编号">
+                    <el-table-column prop="sku" label="编号" width="200px">
                       <template slot-scope="scope">
                         <el-input placeholder="SKU Model" v-model="scope.row.sku"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="skuName" width="350px" label="名字">
+                    <el-table-column prop="skuName" width="200px" label="名字">
                       <template slot-scope="scope">
                         <el-input placeholder="如果你想起一个好记一点的外号" v-model="scope.row.skuName"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="price" label="价格">
+                    <el-table-column prop="size" label="size" width="200px">
                       <template slot-scope="scope">
-                        <el-button @click="handleSetPriceClick(scope.row)">设置价格</el-button>
+                        <el-input placeholder="size" v-model="scope.row.size"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column label="操作">
+                    <el-table-column prop="weight" label="weight" width="200px">
                       <template slot-scope="scope">
+                        <el-input placeholder="weight" v-model="scope.row.weight"></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="quantity_per_carton" label="quantity_per_carton" width="200px">
+                      <template slot-scope="scope">
+                        <el-input placeholder="quantity_per_carton" v-model="scope.row.quantity_per_carton"></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="net_weight_per_carton" label="net_weight_per_carton" width="200px">
+                      <template slot-scope="scope">
+                        <el-input
+                          placeholder="net_weight_per_carton"
+                          v-model="scope.row.net_weight_per_carton"
+                        ></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="gross_weight_per_carton" label="gross_weight_per_carton" width="200px">
+                      <template slot-scope="scope">
+                        <el-input
+                          placeholder="gross_weight_per_carton"
+                          v-model="scope.row.gross_weight_per_carton"
+                        ></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="carton_measurement" label="carton_measurement" width="200px">
+                      <template slot-scope="scope">
+                        <el-input placeholder="carton_measurement" v-model="scope.row.carton_measurement"></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="carton_size" label="carton_size" width="200px">
+                      <template slot-scope="scope">
+                        <el-input placeholder="carton_size" v-model="scope.row.carton_size"></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="200px">
+                      <template slot-scope="scope">
+                        <el-button @click="handleSetPriceClick(scope.row)">设置价格</el-button>
                         <el-button @click="handleSkuDelete(scope.$index)">删除</el-button>
                       </template>
                     </el-table-column>
                   </el-table>
                 </div>
               </el-card>
+            </el-form-item>
+            <el-form-item label="打印属性" prop="printable_attr_ids" required>
+              <el-select multiple v-model="form.printable_attr_ids" placeholder="选择打印属性">
+                <el-option v-for="item in attrs" :key="item.id" :label="item.attr_name" :value="item.id"> </el-option>
+              </el-select>
             </el-form-item>
           </el-form>
         </el-col>
@@ -254,6 +302,7 @@ export default {
       const detail = await product.getProductDetail(pid)
       console.log(detail)
       this.form = {
+        certificates: detail.certificates ? detail.certificates.split(',') : [],
         spu_name: detail.spu_name,
         spu_title: detail.spu_title,
         spu_description: detail.spu_description,
@@ -261,12 +310,20 @@ export default {
         attr_group_id: detail.attr_group_id,
         img_url: detail.img_url,
         price: detail.price,
+        printable_attr_ids: detail.printable_attr_ids ? detail.printable_attr_ids.split(',').map(s => Number(s)) : [],
         publish_status: 1,
       }
       // set default img
       this.initData = [{ display: detail.img_url }]
       await this.initAttrGroups(String(detail.attr_group_id), detail)
       const skuList = detail.sku_list.map(sku => ({
+        weight: sku.weight,
+        size: sku.size,
+        quantity_per_carton: sku.quantity_per_carton,
+        net_weight_per_carton: sku.net_weight_per_carton,
+        gross_weight_per_carton: sku.gross_weight_per_carton,
+        carton_measurement: sku.carton_measurement,
+        carton_size: sku.carton_size,
         skuId: sku.id,
         sku: sku.sku_name,
         skuName: sku.sku_name,
@@ -412,6 +469,13 @@ export default {
         minCount: 1,
         maxCount: 1,
         prePrice: '',
+        size: '',
+        weight: '',
+        quantity_per_carton: '',
+        net_weight_per_carton: '',
+        gross_weight_per_carton: '',
+        carton_measurement: '',
+        carton_size: '',
         salesAttrs,
       }
       this.skuList = [...this.skuList, skuEntity]
@@ -439,6 +503,7 @@ export default {
 
       const transformSkuList = skuList => skuList.map(sku => {
         const skuObj = {
+          ...sku,
           sku_name: sku.sku,
           sku_title: sku.skuName,
           price_list: sku.price.map(priceItem => ({
@@ -457,6 +522,8 @@ export default {
 
       const productObject = {
         ...this.form,
+        certificates: this.form.certificates.join(','),
+        printable_attr_ids: this.form.printable_attr_ids.join(','),
         img_url: featureImgUrl,
         basic_attr_list: this.basicAttrForm.map(attr => ({
           attr_id: attr.attrId,
@@ -489,6 +556,14 @@ export default {
   },
   data() {
     return {
+      certOptions: [
+        {
+          label: 'CE',
+        },
+        {
+          label: 'Rosh',
+        },
+      ],
       editPriceRow: null,
       showEditPrice: false,
       // loading: false,
@@ -507,6 +582,7 @@ export default {
         img_url: '',
         price: '',
         publish_status: 1,
+        printable_attr_ids: [],
       },
       basicAttrForm: [], // for store form value
       saleAttrForm: [], // for store form value

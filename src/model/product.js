@@ -98,6 +98,27 @@ class Product {
       url: `v1/pms-spu-info/detailForPrint?spus=${idsList.join(',')}`,
     })
   }
+
+  async getSkus() {
+    return _axios({
+      method: 'get',
+      url: 'v1/pms-sku-info/list',
+    })
+  }
+
+  async getSkuPriceInfoBySkuId(id) {
+    return _axios({
+      method: 'get',
+      url: `v1/pms-sku-price-info/getBySku/${id}`,
+    })
+  }
+
+  async getDataForPrint(id) {
+    return _axios({
+      method: 'get',
+      url: `v1/ims-contract/getPrintData/${id}`,
+    })
+  }
 }
 
 export default new Product()

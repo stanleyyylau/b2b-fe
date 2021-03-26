@@ -45,8 +45,9 @@
 <script>
 import Editor from '@tinymce/tinymce-vue'
 import contract from '@/model/contract'
-import client from '@/model/client'
+// import client from '@/model/client'
 import product from '@/model/product'
+import { tpl1, tpl2, tpl3, tpl4 } from '@/util/templateRender'
 
 const wukongPluginStr = 'autoresize export print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons lineheight rowspacing'
 // const pluginsFromOfficial = 'export print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons lineheight rowspacing'
@@ -91,20 +92,8 @@ export default {
   methods: {
     async getContractDetail(contractId) {
       this.loading = true
-      const contractDetail = await contract.getDetail(contractId)
-      const clientDetail = await client.getClientDetail(contractDetail.client_id)
-      const spus = await product.getProductDetailsForPrint(contractDetail.spu_ids)
-      const data = {
-        ...contractDetail,
-        ...clientDetail,
-        contact_methods: JSON.parse(clientDetail.contact_methods),
-        products: spus,
-        date: new Date(),
-        createdBy: 'Stanley',
-      }
-      console.log('this is the contract detail', contractDetail)
-      console.log('data is', data)
-      this.dataForRender = data
+      const dataForPrint = await product.getDataForPrint(contractId)
+      this.dataForRender = dataForPrint
       this.loading = false
     },
     async getTmpls() {
@@ -171,40 +160,27 @@ export default {
       this.loading = true
       const res = await contract.getTemplateById(id)
       console.log('templte is', res)
-      let fullTpl = res.template_content
+      // let fullTpl = res.template_content
 
-      try {
-        const productTpl = this.getProductTpl(fullTpl)
-        // render orginal stuff
-        const keys = Object.keys(dataReplaceMap)
-        keys.forEach(key => {
-          if (!key.startsWith('products')) {
-            if (!(key.indexOf('.') >= 0)) {
-              fullTpl = fullTpl.replaceAll(`{${dataReplaceMap[key]}}`, this.dataForRender[key])
-            } else {
-              const splitKeys = key.split('.')
-              const key1 = splitKeys[0]
-              const key2 = splitKeys[1].indexOf('=') >= 0 ? splitKeys[1].split('=')[0] : splitKeys[1]
-              const key2Value = splitKeys[1].indexOf('=') >= 0 ? splitKeys[1].split('=')[1] : ''
-              console.log('nested replace')
-              if (key2Value !== '') {
-                this.dataForRender[key1].forEach(item => {
-                  if (item[key2] === key2Value) {
-                    fullTpl = fullTpl.replaceAll(`{${dataReplaceMap[key]}}`, item.detail) // ugly, optimize later
-                  }
-                })
-              }
-            }
-          }
-        })
-        // render product
-        const renderedProductContent = this.renderProducts(productTpl, this.dataForRender.products)
-        fullTpl = fullTpl.replace(productTpl, renderedProductContent)
-      } catch (e) {
-        console.log('###模版格式不正确###')
+      let renderResult = ''
+      switch (id) {
+        case 1:
+          renderResult = tpl1(this.dataForRender, res.template_content)
+          break
+        case 2:
+          renderResult = tpl2(this.dataForRender, res.template_content)
+          break
+        case 3:
+          renderResult = tpl3(this.dataForRender, res.template_content)
+          break
+        case 4:
+          renderResult = tpl4(this.dataForRender, res.template_content)
+          break
+        default:
+          break
       }
 
-      this.content = fullTpl
+      this.content = renderResult
       this.loading = false
     },
     renderProducts(productTpl, data) {
@@ -236,8 +212,8 @@ export default {
     /** 富文本配置 */
     getEditConfig() {
       return {
-        menubar: false,
-        toolbar_sticky: true,
+        menubar: true,
+        toolbar_sticky: false,
         statusbar: false,
         // height: 700,
         extended_valid_elements: 'span[class|title|wktag|style|contenteditable]',

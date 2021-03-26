@@ -10,50 +10,54 @@
         <el-col :lg="20" :md="20" :sm="24" :xs="24">
           <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
             <el-form-item label="国家" prop="country">
-              <el-input size="medium" placeholder="country" v-model="form.country"></el-input>
+              <el-select filterable v-model="form.country" placeholder="Select">
+                <el-option
+                  @change="generateClientCode"
+                  v-for="item in countryList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="地址">
+              <el-input size="medium" placeholder="地址" v-model="form.address"></el-input>
             </el-form-item>
             <el-form-item label="客户名" prop="client_name">
               <el-input size="medium" placeholder="client_name" v-model="form.client_name"></el-input>
             </el-form-item>
             <el-form-item label="公司名" prop="company_name">
-              <el-input size="medium" placeholder="company_name" v-model="form.company_name"></el-input>
+              <el-input
+                @change="generateClientCode"
+                size="medium"
+                placeholder="company_name"
+                v-model="form.company_name"
+              ></el-input>
             </el-form-item>
             <el-form-item label="意向产品">
               <el-card class="box-card">
                 <div class="interestProductRows">
-                  <el-table
-                    :data="form.interestProducts"
-                    border
-                    style="width: 100%"
-                  >
-                    <el-table-column
-                      label="SKU"
-                      width="200px">
+                  <el-table :data="form.interestProducts" border style="width: 100%">
+                    <el-table-column label="SKU" width="200px">
                       <template slot-scope="scope">
-                        <el-select
-                          v-model="scope.row.spuId"
-                          placeholder="Select"
-                          filterable=true
-                        >
+                        <el-select v-model="scope.row.spuId" placeholder="Select" filterable="true">
                           <el-option
                             v-for="(item, index) in clientInterestProductOptions"
                             :key="index"
                             :label="item.label"
-                            :value="item.value">
+                            :value="item.value"
+                          >
                           </el-option>
                         </el-select>
                       </template>
                     </el-table-column>
-                    <el-table-column
-                      label="数量"
-                      width="200px">
+                    <el-table-column label="数量" width="200px">
                       <template slot-scope="scope">
                         <el-input size="medium" placeholder="输入数量" v-model="scope.row.num"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column
-                      label="备注"
-                      width="200px">
+                    <el-table-column label="备注" width="200px">
                       <template slot-scope="scope">
                         <el-input size="medium" placeholder="填写备注" v-model="scope.row.notes"></el-input>
                       </template>
@@ -79,11 +83,7 @@
             </el-form-item>
             <el-form-item label="等级" prop="client_level">
               <el-select v-model="form.client_level" placeholder="Select">
-                <el-option
-                  v-for="item in clientLevelOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                <el-option v-for="item in clientLevelOptions" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -93,20 +93,19 @@
                   v-for="item in clientIndustryOptions"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
+                  :value="item.value"
+                >
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="来源" prop="source">
-              <el-select v-model="form.source"
-                         allow-create
-                         filterable=true
-                         placeholder="Select">
+              <el-select v-model="form.source" allow-create filterable="true" placeholder="Select">
                 <el-option
                   v-for="item in clientSourceOptions"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
+                  :value="item.value"
+                >
                 </el-option>
               </el-select>
             </el-form-item>
@@ -124,9 +123,9 @@
 </template>
 
 <script>
-
 import product from '@/model/product'
 import client from '@/model/client'
+import country from '@/util/country'
 
 export default {
   components: {},
@@ -135,9 +134,15 @@ export default {
   },
   methods: {
     generateClientCode() {
-      // Todo: check the generation rules
-      console.log('generating client code')
-      return String(new Date().getTime())
+      if (!this.form.country) return
+      if (!this.form.company_name) return
+      const countryCode = this.form.country
+      const yearCode = String(new Date().getFullYear()).substr(2)
+      const companyCode = this.form.company_name
+        .toUpperCase()
+        .replaceAll(' ')
+        .substr(0, 3)
+      this.form.code = `${countryCode}${yearCode}${companyCode}`
     },
     async handleClientAdd() {
       this.loading = true
@@ -148,8 +153,8 @@ export default {
         is_in_public_sea: this.form.isInPublicSea,
         interest_products: this.form.interestProducts.map(productItem => ({
           ...productItem,
-          product_id: productItem.spuId
-        }))
+          product_id: productItem.spuId,
+        })),
       }
       console.log('trnsform form is', transformedForm)
       await client.createClient(transformedForm)
@@ -163,8 +168,8 @@ export default {
         {
           spuId: null,
           num: null,
-          notes: null
-        }
+          notes: null,
+        },
       ]
       this.form.interestProducts = newIp
     },
@@ -172,7 +177,7 @@ export default {
       const res = await product.getProducts()
       const cleanData = res.map(spu => ({
         value: String(spu.id),
-        label: spu.spu_name
+        label: spu.spu_name,
       }))
       const originInterestOptions = this.clientInterestProductOptions
       this.clientInterestProductOptions = [...cleanData, ...originInterestOptions]
@@ -180,6 +185,7 @@ export default {
   },
   data() {
     return {
+      countryList: country,
       loading: false,
       clientLevelOptions: [
         {
@@ -211,38 +217,51 @@ export default {
         {
           value: '品牌商',
           label: '品牌商',
-        }, {
+        },
+        {
           value: '批发商',
           label: '批发商',
-        }, {
+        },
+        {
           value: '电商客户',
           label: '电商客户',
-        }, {
+        },
+        {
           value: '贸易商',
           label: '贸易商',
-        }, {
+        },
+        {
           value: '新入行',
           label: '新入行',
-        }, {
+        },
+        {
           value: '未知',
           label: '未知',
-        }],
-      clientSourceOptions: [{
-        value: '阿里',
-        label: '阿里',
-      }, {
-        value: '开发信',
-        label: '开发信',
-      }, {
-        value: '官网',
-        label: '官网',
-      }],
-      clientInterestProductOptions: [{
-        value: '0',
-        label: '需采购'
-      }],
+        },
+      ],
+      clientSourceOptions: [
+        {
+          value: '阿里',
+          label: '阿里',
+        },
+        {
+          value: '开发信',
+          label: '开发信',
+        },
+        {
+          value: '官网',
+          label: '官网',
+        },
+      ],
+      clientInterestProductOptions: [
+        {
+          value: '0',
+          label: '需采购',
+        },
+      ],
       form: {
         country: '',
+        address: '',
         client_name: '',
         company_name: '',
         contact_methods: [
@@ -265,8 +284,9 @@ export default {
           {
             method: 'other',
             detail: 'stanleyyylau',
-          }],
-        code: this.generateClientCode(),
+          },
+        ],
+        code: '',
         client_level: 'C 普通客户',
         industry: '未知',
         source: '阿里',
@@ -277,17 +297,14 @@ export default {
           //   num: null,
           //   notes: null
           // }
-        ]
+        ],
       },
     }
   },
 }
-
 </script>
 
-
 <style lang="scss" scoped>
-
 .container {
   padding: 0 30px;
 
@@ -311,5 +328,4 @@ export default {
     margin: 20px;
   }
 }
-
 </style>
