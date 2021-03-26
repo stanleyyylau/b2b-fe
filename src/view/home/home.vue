@@ -12,7 +12,7 @@
               <nav-bar></nav-bar>
             </div>
             <el-collapse-transition>
-              <reuse-tab ref="reuse"></reuse-tab>
+              <!--              <reuse-tab ref="reuse"></reuse-tab>-->
             </el-collapse-transition>
           </div>
         </el-header>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { NavBar, SideBar, AppMain, MenuTab, BackTop, ReuseTab } from '@/component/layout'
+import { NavBar, SideBar, AppMain, MenuTab, BackTop } from '@/component/layout'
 
 const navBarHeight = 66 // header高度
 const reuseTabHeight = 70 // 历史记录栏高度
@@ -165,7 +165,7 @@ export default {
     NavBar,
     SideBar,
     AppMain,
-    ReuseTab,
+    // ReuseTab,
     MenuTab,
     BackTop,
   },

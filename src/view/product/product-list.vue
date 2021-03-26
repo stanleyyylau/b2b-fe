@@ -62,8 +62,68 @@
     </el-drawer>
 
     <el-dialog title="产品详情" :visible.sync="dialogTableVisible" @close="viewProductClose">
-      <div>
-        hihihi
+      <div class="product-preview">
+        <div class="basic-info-wrap">
+          <div class="img-wrap">
+            <el-image style="width: 350px; height: 350px" :src="productDetailFromServer.img_url" fit="scale-down">
+            </el-image>
+          </div>
+          <div class="text-wrap">
+            <div class="basic">
+              <div class="row">型号: {{ productDetailFromServer.spu_name }}</div>
+              <div class="row">分类: {{ productDetailFromServer.catalog_id }}</div>
+              <div class="row">标题: {{ productDetailFromServer.spu_title }}</div>
+              <div class="row">证书: {{ productDetailFromServer.certificates }}</div>
+              <div class="row">
+                {{ productDetailFromServer.spu_description }}
+              </div>
+            </div>
+            <div class="attr">
+              <el-table
+                :data="productDetailFromServer.basic_attr_list"
+                header-row-class-name="attr-header"
+                row-class-name="attr-row"
+                border
+                style="width: 100%"
+              >
+                <el-table-column prop="attr_name" label="属性名"> </el-table-column>
+                <el-table-column prop="attr_value" label="属性值"> </el-table-column>
+              </el-table>
+            </div>
+          </div>
+        </div>
+        <div class="sku-list-wrap">
+          <h3>SKU 列表</h3>
+          <el-card class="box-card">
+            <div class="skuTableWrap">
+              <el-table :data="skuList" border style="width: 100%">
+                <el-table-column prop="salesAttrs" width="200px" label="销售属性">
+                  <template slot-scope="scope">
+                    <div v-for="attr in scope.row.sale_attr_list" :key="attr.id">
+                      {{ attr.attr_name }} : {{ attr.attr_value }}
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="sku" label="编号"></el-table-column>
+                <el-table-column prop="skuName" label="名字"></el-table-column>
+                <el-table-column prop="salesAttrs" width="130px" label="价格">
+                  <template slot-scope="scope">
+                    <div v-for="price in scope.row.price_list" :key="price.id">
+                      {{ price.start_count }} - {{ price.end_count }} : {{ price.price }}
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="size" label="size"></el-table-column>
+                <el-table-column prop="weight" label="weight"></el-table-column>
+                <el-table-column prop="quantity_per_carton" label="quantity_per_carton"></el-table-column>
+                <el-table-column prop="net_weight_per_carton" label="net_weight_per_carton"></el-table-column>
+                <el-table-column prop="gross_weight_per_carton" label="gross_weight_per_carton"></el-table-column>
+                <el-table-column prop="carton_measurement" label="carton_measurement"></el-table-column>
+                <el-table-column prop="carton_size" label="carton_size"></el-table-column>
+              </el-table>
+            </div>
+          </el-card>
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -71,21 +131,29 @@
 
 <script>
 import product from '@/model/product'
+import category from '@/model/category'
 
 export default {
   components: {},
   async created() {
     await this.getProducts()
+    const res = await category.getSecondLevelCategories()
+    this.categoryFromServer = res
   },
   methods: {
+    getCategoryNameById(id) {
+      const match = this.categoryFromServer.filter(cate => String(cate.id) === String(id))
+      return match[0].name
+    },
     async handleView(id) {
       this.dialogTableVisible = true
       const res = await product.getProductDetail(id)
+      console.log('res', res)
       this.productDetailFromServer = res
     },
     viewProductClose() {
       this.dialogTableVisible = false
-      this.productDetailFromServer = null
+      this.productDetailFromServer = {}
     },
     handleDelete(id) {
       this.$confirm('此操作将永久删除该产品, 是否继续?', '提示', {
@@ -163,8 +231,15 @@ export default {
   },
   data() {
     return {
+      basicAttrList: [
+        {
+          attr_name: 'projecting size',
+          attr_value: '100px',
+        },
+      ],
+      categoryFromServer: [],
       dialogTableVisible: false,
-      productDetailFromServer: null,
+      productDetailFromServer: {},
       showDrawer: false,
       showDrawerForSpuId: '',
       isFileUploading: false,
@@ -218,13 +293,23 @@ export default {
       ],
     }
   },
+  computed: {
+    skuList() {
+      if (this.productDetailFromServer.sku_list == null) return []
+      return this.productDetailFromServer.sku_list.map(sku => ({
+        ...sku,
+        catalog_id: this.getCategoryNameById(this.productDetailFromServer.catalog_id),
+        price: sku.price_list.map(price => `${price.start_count} - ${price.end_count}: ${price.price}`).join(','),
+        sale_attr: sku.sale_attr_list.map(attr => `${attr.attr_name}:${attr.attr_value}`).join(','),
+      }))
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .container {
   padding: 0 30px;
-
   .header {
     display: flex;
     justify-content: space-between;
@@ -248,5 +333,39 @@ export default {
   .operation-row {
     padding: 3px 0;
   }
+}
+
+.basic-info-wrap {
+  display: flex;
+}
+
+.text-wrap {
+  padding: 0 30px;
+  flex: 1;
+}
+
+.row {
+  font-size: 16px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+tr.el-table__row.attr-row {
+  height: 35px !important;
+}
+
+tr.attr-header {
+  height: 40px !important;
+}
+
+.text-wrap .attr {
+  margin-top: 25px;
+}
+
+h3 {
+  font-size: 25px;
+  padding: 20px 0 8px 0;
+  font-weight: 500;
+  border-bottom: 1px solid #5a6c8e;
 }
 </style>

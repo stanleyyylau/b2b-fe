@@ -6,118 +6,120 @@
         <div class="title">新增客户</div>
       </div>
 
-      <el-row>
-        <el-col :lg="20" :md="20" :sm="24" :xs="24">
-          <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
-            <el-form-item label="国家" prop="country">
-              <el-select filterable v-model="form.country" placeholder="Select">
-                <el-option
-                  @change="generateClientCode"
-                  v-for="item in countryList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="地址">
-              <el-input size="medium" placeholder="地址" v-model="form.address"></el-input>
-            </el-form-item>
-            <el-form-item label="客户名" prop="client_name">
-              <el-input size="medium" placeholder="client_name" v-model="form.client_name"></el-input>
-            </el-form-item>
-            <el-form-item label="公司名" prop="company_name">
-              <el-input
-                @change="generateClientCode"
-                size="medium"
-                placeholder="company_name"
-                v-model="form.company_name"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="意向产品">
-              <el-card class="box-card">
-                <div class="interestProductRows">
-                  <el-table :data="form.interestProducts" border style="width: 100%">
-                    <el-table-column label="SKU" width="200px">
-                      <template slot-scope="scope">
-                        <el-select v-model="scope.row.spuId" placeholder="Select" filterable="true">
-                          <el-option
-                            v-for="(item, index) in clientInterestProductOptions"
-                            :key="index"
-                            :label="item.label"
-                            :value="item.value"
-                          >
-                          </el-option>
-                        </el-select>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="数量" width="200px">
-                      <template slot-scope="scope">
-                        <el-input size="medium" placeholder="输入数量" v-model="scope.row.num"></el-input>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="备注" width="200px">
-                      <template slot-scope="scope">
-                        <el-input size="medium" placeholder="填写备注" v-model="scope.row.notes"></el-input>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-                <div>
-                  <el-button @click="handleInterestProductAdd">新增意向产品</el-button>
-                </div>
-              </el-card>
-            </el-form-item>
-            <el-form-item label="联系方式" prop="contact_methods">
-              <el-card class="box-card">
-                <div v-for="(item, key) in form.contact_methods" :key="key" class="text item">
-                  <el-form-item :label="item.method" :prop="item.detail">
-                    <el-input size="medium" :placeholder="item.method" v-model="item.detail"></el-input>
-                  </el-form-item>
-                </div>
-              </el-card>
-            </el-form-item>
-            <el-form-item label="客户代码" prop="code">
-              <el-input size="medium" placeholder="code" v-model="form.code"></el-input>
-            </el-form-item>
-            <el-form-item label="等级" prop="client_level">
-              <el-select v-model="form.client_level" placeholder="Select">
-                <el-option v-for="item in clientLevelOptions" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="行业" prop="industry">
-              <el-select v-model="form.industry" placeholder="Select">
-                <el-option
-                  v-for="item in clientIndustryOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="来源" prop="source">
-              <el-select v-model="form.source" allow-create filterable="true" placeholder="Select">
-                <el-option
-                  v-for="item in clientSourceOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="放进公海" prop="isInPublicSea">
-              <el-switch v-model="form.isInPublicSea"></el-switch>
-            </el-form-item>
-            <el-form-item style="padding-bottom: 50px">
-              <el-button type="primary" v-on:click="handleClientAdd" :loading="loading">确定新增客户</el-button>
-            </el-form-item>
-          </el-form>
-        </el-col>
-      </el-row>
+      <!--      <el-row>-->
+      <!--        <el-col :lg="20" :md="20" :sm="24" :xs="24">-->
+      <!--          <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>-->
+      <!--            <el-form-item label="国家" prop="country">-->
+      <!--              <el-select filterable v-model="form.country" placeholder="Select">-->
+      <!--                <el-option-->
+      <!--                  @change="generateClientCode"-->
+      <!--                  v-for="item in countryList"-->
+      <!--                  :key="item.value"-->
+      <!--                  :label="item.label"-->
+      <!--                  :value="item.value"-->
+      <!--                >-->
+      <!--                </el-option>-->
+      <!--              </el-select>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="地址">-->
+      <!--              <el-input size="medium" placeholder="地址" v-model="form.address"></el-input>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="客户名" prop="client_name">-->
+      <!--              <el-input size="medium" placeholder="client_name" v-model="form.client_name"></el-input>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="公司名" prop="company_name">-->
+      <!--              <el-input-->
+      <!--                @change="generateClientCode"-->
+      <!--                size="medium"-->
+      <!--                placeholder="company_name"-->
+      <!--                v-model="form.company_name"-->
+      <!--              ></el-input>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="意向产品">-->
+      <!--              <el-card class="box-card">-->
+      <!--                <div class="interestProductRows">-->
+      <!--                  <el-table :data="form.interestProducts" border style="width: 100%">-->
+      <!--                    <el-table-column label="SKU" width="200px">-->
+      <!--                      <template slot-scope="scope">-->
+      <!--                        <el-select v-model="scope.row.spuId" placeholder="Select" filterable="true">-->
+      <!--                          <el-option-->
+      <!--                            v-for="(item, index) in clientInterestProductOptions"-->
+      <!--                            :key="index"-->
+      <!--                            :label="item.label"-->
+      <!--                            :value="item.value"-->
+      <!--                          >-->
+      <!--                          </el-option>-->
+      <!--                        </el-select>-->
+      <!--                      </template>-->
+      <!--                    </el-table-column>-->
+      <!--                    <el-table-column label="数量" width="200px">-->
+      <!--                      <template slot-scope="scope">-->
+      <!--                        <el-input size="medium" placeholder="输入数量" v-model="scope.row.num"></el-input>-->
+      <!--                      </template>-->
+      <!--                    </el-table-column>-->
+      <!--                    <el-table-column label="备注" width="200px">-->
+      <!--                      <template slot-scope="scope">-->
+      <!--                        <el-input size="medium" placeholder="填写备注" v-model="scope.row.notes"></el-input>-->
+      <!--                      </template>-->
+      <!--                    </el-table-column>-->
+      <!--                  </el-table>-->
+      <!--                </div>-->
+      <!--                <div>-->
+      <!--                  <el-button @click="handleInterestProductAdd">新增意向产品</el-button>-->
+      <!--                </div>-->
+      <!--              </el-card>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="联系方式" prop="contact_methods">-->
+      <!--              <el-card class="box-card">-->
+      <!--                <div v-for="(item, key) in form.contact_methods" :key="key" class="text item">-->
+      <!--                  <el-form-item :label="item.method" :prop="item.detail">-->
+      <!--                    <el-input size="medium" :placeholder="item.method" v-model="item.detail"></el-input>-->
+      <!--                  </el-form-item>-->
+      <!--                </div>-->
+      <!--              </el-card>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="客户代码" prop="code">-->
+      <!--              <el-input size="medium" placeholder="code" v-model="form.code"></el-input>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="等级" prop="client_level">-->
+      <!--              <el-select v-model="form.client_level" placeholder="Select">-->
+      <!--                <el-option v-for="item in clientLevelOptions" :key="item.value" :label="item.label" :value="item.value">-->
+      <!--                </el-option>-->
+      <!--              </el-select>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="行业" prop="industry">-->
+      <!--              <el-select v-model="form.industry" placeholder="Select">-->
+      <!--                <el-option-->
+      <!--                  v-for="item in clientIndustryOptions"-->
+      <!--                  :key="item.value"-->
+      <!--                  :label="item.label"-->
+      <!--                  :value="item.value"-->
+      <!--                >-->
+      <!--                </el-option>-->
+      <!--              </el-select>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="来源" prop="source">-->
+      <!--              <el-select v-model="form.source" allow-create filterable="true" placeholder="Select">-->
+      <!--                <el-option-->
+      <!--                  v-for="item in clientSourceOptions"-->
+      <!--                  :key="item.value"-->
+      <!--                  :label="item.label"-->
+      <!--                  :value="item.value"-->
+      <!--                >-->
+      <!--                </el-option>-->
+      <!--              </el-select>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item label="放进公海" prop="isInPublicSea">-->
+      <!--              <el-switch v-model="form.isInPublicSea"></el-switch>-->
+      <!--            </el-form-item>-->
+      <!--            <el-form-item style="padding-bottom: 50px">-->
+      <!--              <el-button type="primary" v-on:click="handleClientAdd" :loading="loading">确定新增客户</el-button>-->
+      <!--            </el-form-item>-->
+      <!--          </el-form>-->
+      <!--        </el-col>-->
+      <!--      </el-row>-->
+
+      <client-form :loading="loading" @addOrUpdate="handleClientAdd" />
     </div>
   </div>
 </template>
@@ -126,12 +128,13 @@
 import product from '@/model/product'
 import client from '@/model/client'
 import country from '@/util/country'
+import clientForm from './client-form'
 
 export default {
-  components: {},
-  created() {
-    this.setUPSpuData()
+  components: {
+    clientForm,
   },
+  created() {},
   methods: {
     generateClientCode() {
       if (!this.form.country) return
@@ -144,19 +147,8 @@ export default {
         .substr(0, 3)
       this.form.code = `${countryCode}${yearCode}${companyCode}`
     },
-    async handleClientAdd() {
+    async handleClientAdd(transformedForm) {
       this.loading = true
-      console.log('this form is', this.form)
-      const transformedForm = {
-        ...this.form,
-        contact_methods: JSON.stringify(this.form.contact_methods),
-        is_in_public_sea: this.form.isInPublicSea,
-        interest_products: this.form.interestProducts.map(productItem => ({
-          ...productItem,
-          product_id: productItem.spuId,
-        })),
-      }
-      console.log('trnsform form is', transformedForm)
       await client.createClient(transformedForm)
       this.loading = false
       this.$router.back()
@@ -275,6 +267,10 @@ export default {
           },
           {
             method: '电话',
+            detail: 'stanleyyylau',
+          },
+          {
+            method: '手机',
             detail: 'stanleyyylau',
           },
           {
