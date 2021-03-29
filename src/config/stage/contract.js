@@ -43,6 +43,7 @@ const contractRouter = {
       filePath: 'view/contract/contract-pending.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
+      permission: ['新增产品'],
     },
   ],
 }

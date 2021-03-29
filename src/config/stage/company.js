@@ -7,6 +7,7 @@ const companyRouter = {
   filePath: 'view/company/', // 文件路径
   order: null,
   inNav: true,
+  permission: ['新增产品'],
   children: [
     {
       title: '打印模版',

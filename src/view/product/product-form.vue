@@ -561,7 +561,13 @@ export default {
           label: 'CE',
         },
         {
-          label: 'Rosh',
+          label: 'RoHS',
+        },
+        {
+          label: 'FCC',
+        },
+        {
+          label: 'ISO',
         },
       ],
       editPriceRow: null,

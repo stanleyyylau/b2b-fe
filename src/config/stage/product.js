@@ -16,6 +16,7 @@ const productRouter = {
       filePath: 'view/product/product-create.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
+      permission: ['新增产品'],
     },
     {
       title: '编辑产品',
@@ -43,6 +44,7 @@ const productRouter = {
       filePath: 'view/product/product-category.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
+      permission: ['新增产品'],
     },
     {
       title: '产品二级分类',
@@ -70,6 +72,7 @@ const productRouter = {
       filePath: 'view/product/attr-group-list.vue',
       inNav: true,
       icon: 'iconfont icon-tushuguanli',
+      permission: ['新增产品'],
     },
     {
       title: '新增产品属性',

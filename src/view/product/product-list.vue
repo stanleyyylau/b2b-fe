@@ -26,15 +26,32 @@
               <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleView(scope.row.id)">
                 查看
               </el-button>
-              <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
+              <el-button
+                v-permission="['新增产品']"
+                plain
+                type="primary"
+                size="mini"
+                @click.native.prevent.stop="handleEdit(scope.row.id)"
+              >
                 编辑
               </el-button>
             </div>
             <div class="operation-row">
-              <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
+              <el-button
+                v-permission="['新增产品']"
+                plain
+                type="primary"
+                size="mini"
+                @click.native.prevent.stop="handleDrawer(scope.row.id)"
+              >
                 文件
               </el-button>
-              <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope.row.id)"
+              <el-button
+                v-permission="['新增产品']"
+                plain
+                type="danger"
+                size="mini"
+                @click.native.prevent.stop="handleDelete(scope.row.id)"
                 >删除</el-button
               >
             </div>

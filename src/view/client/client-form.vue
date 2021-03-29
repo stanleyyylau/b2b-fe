@@ -279,27 +279,27 @@ export default {
         contact_methods: [
           {
             method: '阿里巴巴',
-            detail: 'stanleyyylau',
+            detail: '',
           },
           {
             method: '邮箱',
-            detail: 'stanleyyylau',
+            detail: '',
           },
           {
             method: '电话',
-            detail: 'stanleyyylau',
+            detail: '',
           },
           {
             method: '手机',
-            detail: 'stanleyyylau',
+            detail: '',
           },
           {
             method: '社交媒体',
-            detail: 'stanleyyylau',
+            detail: '',
           },
           {
             method: 'other',
-            detail: 'stanleyyylau',
+            detail: '',
           },
         ],
         code: '',

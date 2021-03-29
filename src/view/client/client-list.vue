@@ -19,20 +19,41 @@
         <el-table-column prop="client_level" label="客户等级" width="120"> </el-table-column>
         <el-table-column prop="industry" label="客户行业" width="120"> </el-table-column>
         <el-table-column prop="source" label="来源" width="120"> </el-table-column>
-        <el-table-column fixed="right" label="Operations" width="170">
+        <el-table-column fixed="right" label="Operations" width="200">
           <template slot-scope="scope">
-            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
-              Edit
-            </el-button>
-            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
-              Files
-            </el-button>
-            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleFollowHistory(scope.row.id)">
-              跟进记录
-            </el-button>
-            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope.row.id)"
-              >Delete</el-button
-            >
+            <div class="operation-row">
+              <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
+                编辑客户
+              </el-button>
+              <el-button
+                v-permission="['新增产品']"
+                plain
+                type="primary"
+                size="mini"
+                @click.native.prevent.stop="handleDrawer(scope.row.id)"
+              >
+                查看文件
+              </el-button>
+            </div>
+            <div class="operation-row">
+              <el-button
+                v-permission="['新增产品']"
+                plain
+                type="primary"
+                size="mini"
+                @click.native.prevent.stop="handleFollowHistory(scope.row.id)"
+              >
+                跟进记录
+              </el-button>
+              <el-button
+                v-permission="['新增产品']"
+                plain
+                type="danger"
+                size="mini"
+                @click.native.prevent.stop="handleDelete(scope.row.id)"
+                >删除客户</el-button
+              >
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -235,6 +256,10 @@ export default {
 <style lang="scss" scoped>
 .container {
   padding: 0 30px;
+
+  .operation-row {
+    padding: 3px 0;
+  }
 
   .header {
     display: flex;

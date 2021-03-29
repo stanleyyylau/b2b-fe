@@ -4,11 +4,11 @@
       <el-col :lg="20" :md="20" :sm="24" :xs="24">
         <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
           <el-form-item label="合同日期">
-            <el-date-picker v-model="form.contract_time" type="datetime" placeholder="Select date and time">
+            <el-date-picker type="date" v-model="form.contract_time" placeholder="Select date and time">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="交货日期">
-            <el-date-picker v-model="form.delivery_time" type="datetime" placeholder="Select date and time">
+            <el-date-picker type="date" v-model="form.delivery_time" placeholder="Select date and time">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="客户">
@@ -26,7 +26,7 @@
           <el-form-item label="其他费用">
             <el-input v-model="form.other_fee"></el-input>
           </el-form-item>
-          <el-form-item label="收获地址">
+          <el-form-item label="收货地址">
             <el-input v-model="form.delivery_address"></el-input>
           </el-form-item>
           <el-form-item label="运费">
@@ -36,7 +36,7 @@
             <el-input v-model="form.transaction_fee"></el-input>
           </el-form-item>
           <el-form-item label="Terms">
-            <el-select v-model="form.terms_of_sale" placeholder="Select">
+            <el-select multiple v-model="form.terms_of_sale" placeholder="Select">
               <el-option v-for="item in termOfSale" :key="item.value" :label="item.value" :value="item.value">
               </el-option>
             </el-select>
@@ -55,7 +55,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="备注">
-            <el-input type="text" v-model="form.notes"></el-input>
+            <el-input type="text" v-model="form.notes" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item label="付款状态">
             <el-select v-model="form.payment_status" allow-create placeholder="Select">
@@ -67,14 +67,26 @@
               v-model="form.prepay_amount"
               placeholder="输入预付款金额"
             ></el-input>
-            <el-input
+            <!-- <el-input
               v-if="form.payment_status === '其他'"
-              v-model="form.prepay_amount"
+              v-model="form.notes"
               placeholder="填写备注"
-            ></el-input>
+            ></el-input> -->
+            <div v-if="form.review_status === '审核中'">
+              <span>Holly 审核中</span>
+            </div>
+            <div v-else>
+              <el-checkbox v-if="showSubmitForReview" v-model="submitForReview">提交给 Holly 审核 </el-checkbox>
+            </div>
           </el-form-item>
           <el-form-item label="成本价">
-            <el-input v-model="form.raw_cost"></el-input>
+            <el-input v-model="form.raw_cost" :disabled="!isAdmin"></el-input>
+          </el-form-item>
+          <el-form-item label="审核状态" v-if="isAdmin">
+            <el-select v-model="form.review_status" placeholder="Select">
+              <el-option v-for="item in review_statusOption" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="关联产品">
             <el-card class="box-card">
@@ -161,16 +173,21 @@ export default {
   async created() {
     await this.getClients()
     await this.getSpus()
+    console.log('hihi')
+    this.isAdmin = Boolean(this.$router.history.current.query.admin) || false
     if (this.editId && this.editId !== 0) {
       await this.getContractDetail(this.editId)
     }
     console.log('finish getting client')
+    window.contract = this
   },
   methods: {
     async getContractDetail(id) {
       const res = await contract.getDetail(id)
+      this.submitForReview = res.review_status === '审核中'
       this.form = {
         ...res,
+        reviewStatus: res.review_status,
         skus: res.skus.map(sku => ({
           spu_sku: [sku.spu_id, sku.sku_id],
           quantity: sku.quantity,
@@ -187,6 +204,7 @@ export default {
       this.loading = true
       const data = {
         ...this.form,
+        review_status: this.submitForReview ? '审核中' : null,
         skus: this.form.skus.map(item => ({
           spu_id: item.spu_sku[0],
           sku_id: item.spu_sku[1],
@@ -278,6 +296,8 @@ export default {
   },
   data() {
     return {
+      isAdmin: false,
+      submitForReview: false,
       termOfSale: [
         {
           value: 'term of sale1',
@@ -327,6 +347,20 @@ export default {
           label: '1688',
         },
       ],
+      review_statusOption: [
+        {
+          value: '已审核',
+          label: '已审核',
+        },
+        {
+          value: '拒绝',
+          label: '拒绝',
+        },
+        {
+          value: '审核中',
+          label: '审核中',
+        },
+      ],
       form: {
         delivery_address: '',
         shipping_cost: '',
@@ -337,18 +371,26 @@ export default {
         contract_time: new Date(),
         delivery_time: new Date(),
         client_id: null,
-        total_amount: 888,
-        actual_delivery_fee: 999,
+        total_amount: 0,
+        actual_delivery_fee: 0,
         prepay_amount: null,
-        other_fee: 999,
+        other_fee: 0,
         payment_method: '',
         notes: '',
         payment_status: '',
-        raw_cost: 777,
+        raw_cost: 0,
         review_status: '',
         skus: [],
       },
     }
+  },
+  computed: {
+    showSubmitForReview() {
+      if (!this.form) return false
+      if (this.form.review_status) return false
+      if (this.form.payment_status === '款项收齐') return true
+      return false
+    },
   },
 }
 </script>

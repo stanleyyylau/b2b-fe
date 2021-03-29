@@ -19,18 +19,29 @@
         <el-table-column prop="client_level" label="客户等级" width="120"> </el-table-column>
         <el-table-column prop="industry" label="客户行业" width="120"> </el-table-column>
         <el-table-column prop="source" label="来源" width="120"> </el-table-column>
-        <el-table-column fixed="right" label="Operations" width="170">
+        <el-table-column fixed="right" label="Operations" width="200">
           <template slot-scope="scope">
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
-              Edit
+              编辑客户
             </el-button>
-            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
+            <el-button
+              v-permission="['新增产品']"
+              plain
+              type="primary"
+              size="mini"
+              @click.native.prevent.stop="handleDrawer(scope.row.id)"
+            >
               Files
             </el-button>
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleTakeInClient(scope.row.id)"
               >领取该客户
             </el-button>
-            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope.row.id)"
+            <el-button
+              v-permission="['新增产品']"
+              plain
+              type="danger"
+              size="mini"
+              @click.native.prevent.stop="handleDelete(scope.row.id)"
               >Delete
             </el-button>
           </template>

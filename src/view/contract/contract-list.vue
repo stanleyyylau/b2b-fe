@@ -15,7 +15,7 @@
         <el-table-column prop="raw_cost" label="raw_cost" width="150"> </el-table-column>
         <el-table-column prop="review_status" label="review_status" width="150"> </el-table-column>
         <el-table-column prop="client_id" label="client_id" width="150"> </el-table-column>
-        <el-table-column fixed="right" label="Operations" width="170">
+        <el-table-column fixed="right" label="Operations" width="200">
           <template slot-scope="scope">
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
               Edit
