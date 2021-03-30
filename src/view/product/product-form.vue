@@ -14,6 +14,9 @@
             <el-form-item label="标题" prop="spu_title">
               <el-input size="medium" placeholder="标题" v-model="form.spu_title"></el-input>
             </el-form-item>
+            <el-form-item label="供应商" prop="supplier">
+              <el-input size="medium" placeholder="供应商" v-model="form.supplier"></el-input>
+            </el-form-item>
             <el-form-item label="证书">
               <el-select multiple v-model="form.certificates" placeholder="选择证书">
                 <el-option v-for="item in certOptions" :key="item.label" :label="item.label" :value="item.label">
@@ -107,12 +110,22 @@
                         <el-input placeholder="如果你想起一个好记一点的外号" v-model="scope.row.skuName"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="size" label="size" width="200px">
+                    <el-table-column prop="rawPrice" width="200px" label="成本价">
+                      <template slot-scope="scope">
+                        <el-input placeholder="sku成本价" v-model="scope.row.rawPrice"></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="productSize" label="Product Size" width="200px">
+                      <template slot-scope="scope">
+                        <el-input placeholder="product size" v-model="scope.row.productSize"></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="size" label="Package Size" width="200px">
                       <template slot-scope="scope">
                         <el-input placeholder="size" v-model="scope.row.size"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="weight" label="weight" width="200px">
+                    <el-table-column prop="weight" label="Package Weight" width="200px">
                       <template slot-scope="scope">
                         <el-input placeholder="weight" v-model="scope.row.weight"></el-input>
                       </template>
@@ -305,6 +318,7 @@ export default {
         certificates: detail.certificates ? detail.certificates.split(',') : [],
         spu_name: detail.spu_name,
         spu_title: detail.spu_title,
+        supplier: detail.supplier,
         spu_description: detail.spu_description,
         catalog_id: detail.catalog_id,
         attr_group_id: detail.attr_group_id,
@@ -327,6 +341,8 @@ export default {
         skuId: sku.id,
         sku: sku.sku_name,
         skuName: sku.sku_name,
+        rawPrice: sku.raw_price,
+        productSize: sku.product_size,
         price: sku.price_list.map(price => ({
           sku_id: price.sku_id,
           minCount: price.start_count,
@@ -465,7 +481,9 @@ export default {
         clientSideId: v4(),
         sku: generateSkuName(salesAttrs, this.form.spu_name),
         skuName: '',
+        rawPrice: '',
         price: [],
+        productSize: '',
         minCount: 1,
         maxCount: 1,
         prePrice: '',
@@ -506,6 +524,8 @@ export default {
           ...sku,
           sku_name: sku.sku,
           sku_title: sku.skuName,
+          raw_price: sku.rawPrice,
+          product_size: sku.productSize,
           price_list: sku.price.map(priceItem => ({
             start_count: priceItem.minCount,
             end_count: priceItem.maxCount,
@@ -582,6 +602,7 @@ export default {
       form: {
         spu_name: '',
         spu_title: '',
+        supplier: '',
         spu_description: '',
         catalog_id: '',
         attr_group_id: '',
