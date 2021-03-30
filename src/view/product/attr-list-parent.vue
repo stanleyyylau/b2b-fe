@@ -46,10 +46,17 @@ export default {
       })
     },
     async handleEdit(scope) {
-      this.editAttrId = scope.row.id
-      const res = await attribute.getAttrsById(this.editAttrId)
-      console.log(res, 'res')
-      console.log(scope)
+      // this.editAttrId = scope.row.id
+      // const res = await attribute.getAttrsById(this.editAttrId)
+      // console.log(res, 'res')
+      // console.log(scope)
+      this.$router.push({
+        path: '/attr/edit',
+        query: {
+          groupId: this.attrGroupId,
+          id: scope.row.id,
+        },
+      })
     },
     async handleDelete(scope) {
       this.$confirm('此操作将永久删除该属性, 是否继续?', '提示', {
@@ -104,11 +111,11 @@ export default {
       ],
       tableData: [],
       operate: [
-        // {
-        //   name: '编辑',
-        //   func: 'handleEdit',
-        //   type: 'primary',
-        // },
+        {
+          name: '编辑',
+          func: 'handleEdit',
+          type: 'primary',
+        },
         {
           name: '删除',
           func: 'handleDelete',

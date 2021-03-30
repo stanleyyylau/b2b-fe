@@ -74,6 +74,15 @@ class Attribute {
       },
     })
   }
+
+  async updateAttr(id, data) {
+    return _axios({
+      method: 'put',
+      url: `v1/pms-attr/${id}`,
+      handleError: true,
+      data,
+    })
+  }
 }
 
 export default new Attribute()

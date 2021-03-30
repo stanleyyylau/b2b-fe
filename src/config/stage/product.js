@@ -84,6 +84,15 @@ const productRouter = {
       icon: 'iconfont icon-tushuguanli',
     },
     {
+      title: '编辑产品属性',
+      type: 'view',
+      name: 'ProductAttr',
+      route: '/attr/edit',
+      filePath: 'view/product/attr-edit.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    },
+    {
       title: '产品属性',
       type: 'view',
       name: 'ProductAttrByParent',

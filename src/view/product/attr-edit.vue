@@ -3,9 +3,9 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header">
-        <div class="title">新增产品属性</div>
+        <div class="title">编辑产品属性</div>
       </div>
-      <attrFrom :loading="loading" @addOrUpdate="handleSubmit" />
+      <attrFrom :loading="loading" :edit-id="editId" @addOrUpdate="handleSubmit" />
     </div>
   </div>
 </template>
@@ -21,6 +21,7 @@ export default {
   async created() {
     await this.getAttrGroupsOptions()
     this.form.attr_group_id = Number(this.$router.history.current.query.groupId)
+    this.editId = Number(this.$router.history.current.query.id) || 0
   },
   methods: {
     goBack() {
@@ -43,7 +44,8 @@ export default {
         this.loading = true
         // const data = { ...this.form }
         // data.value_select = data.value_select.replaceAll(/\n/g, ',')
-        const res = await attribute.createAttr(data)
+        // todo: change to update attr
+        const res = await attribute.updateAttr(this.editId, data)
         this.loading = false
         // console.log(this.form, formName)
         if (res.code < window.MAX_SUCCESS_CODE) {
@@ -59,6 +61,7 @@ export default {
   },
   data() {
     return {
+      editId: 0,
       loading: false,
       tableColumn: [
         {
