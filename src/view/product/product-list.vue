@@ -91,7 +91,7 @@
               <div class="row">分类: {{ productDetailFromServer.catalog_id }}</div>
               <div class="row">标题: {{ productDetailFromServer.spu_title }}</div>
               <div class="row">证书: {{ productDetailFromServer.certificates }}</div>
-              <div class="row">供应商: {{ productDetailFromServer.supplier }}</div>
+              <!--              <div class="row">供应商: {{ productDetailFromServer.supplier }}</div>-->
               <div class="row">
                 {{ productDetailFromServer.spu_description }}
               </div>
