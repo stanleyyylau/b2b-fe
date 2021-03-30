@@ -91,6 +91,7 @@
               <div class="row">分类: {{ productDetailFromServer.catalog_id }}</div>
               <div class="row">标题: {{ productDetailFromServer.spu_title }}</div>
               <div class="row">证书: {{ productDetailFromServer.certificates }}</div>
+              <div class="row">供应商: {{ productDetailFromServer.supplier }}</div>
               <div class="row">
                 {{ productDetailFromServer.spu_description }}
               </div>
@@ -123,6 +124,7 @@
                 </el-table-column>
                 <el-table-column prop="sku" label="编号"></el-table-column>
                 <el-table-column prop="skuName" label="名字"></el-table-column>
+                <el-table-column prop="product_size" label="Product Size"></el-table-column>
                 <el-table-column prop="salesAttrs" width="130px" label="价格">
                   <template slot-scope="scope">
                     <div v-for="price in scope.row.price_list" :key="price.id">
@@ -130,8 +132,8 @@
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column prop="size" label="size"></el-table-column>
-                <el-table-column prop="weight" label="weight"></el-table-column>
+                <el-table-column prop="size" label="Package Size"></el-table-column>
+                <el-table-column prop="weight" label="Package Weight"></el-table-column>
                 <el-table-column prop="quantity_per_carton" label="quantity_per_carton"></el-table-column>
                 <el-table-column prop="net_weight_per_carton" label="net_weight_per_carton"></el-table-column>
                 <el-table-column prop="gross_weight_per_carton" label="gross_weight_per_carton"></el-table-column>
