@@ -3,14 +3,14 @@
     <el-col :lg="20" :md="20" :sm="24" :xs="24">
       <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
         <el-form-item label="国家" prop="country">
-          <el-select filterable v-model="form.country" placeholder="Select">
-            <el-option
-              @change="generateClientCode"
-              v-for="item in countryList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select filterable v-model="form.country" placeholder="Select" @change="generateClientCode">
+            <el-option v-for="item in countryList" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产品分类" prop="category">
+          <el-select filterable v-model="form.category" placeholder="Select">
+            <el-option v-for="(item, index) in categoryOptions" :key="index" :label="item.value" :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -18,7 +18,12 @@
           <el-input size="medium" placeholder="地址" v-model="form.address"></el-input>
         </el-form-item>
         <el-form-item label="客户名" prop="client_name">
-          <el-input size="medium" placeholder="client_name" v-model="form.client_name"></el-input>
+          <el-input
+            size="medium"
+            placeholder="client_name"
+            v-model="form.client_name"
+            @change="generateClientCode"
+          ></el-input>
         </el-form-item>
         <el-form-item label="公司名" prop="company_name">
           <el-input
@@ -148,6 +153,7 @@ export default {
       console.log(this.form)
     },
     generateClientCode() {
+      console.log('generate client code')
       if (!this.form.country) return
       if (!this.form.company_name) return
       const countryCode = this.form.country
@@ -205,6 +211,20 @@ export default {
   },
   data() {
     return {
+      categoryOptions: [
+        {
+          value: '口罩（防疫物资）',
+        },
+        {
+          value: '搜索引擎',
+        },
+        {
+          value: '金属卡包',
+        },
+        {
+          value: '3C电子 （耳机，音箱，充电线）',
+        },
+      ],
       loadingForEdit: false,
       countryList: country,
       clientLevelOptions: [
@@ -284,6 +304,7 @@ export default {
         },
       ],
       form: {
+        category: '',
         country: '',
         address: '',
         client_name: '',
