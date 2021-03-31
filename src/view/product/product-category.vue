@@ -30,6 +30,7 @@ export default {
     LinTable,
   },
   async created() {
+    this.loading = true
     await this.getTopLevelCates()
     this.loading = false
   },
@@ -77,6 +78,7 @@ export default {
           permission: '删除图书',
         },
       ],
+      loading: false,
       showEdit: false,
       editBookID: 1,
     }

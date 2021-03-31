@@ -19,6 +19,13 @@ class Client {
     })
   }
 
+  async page(count, page) {
+    return _axios({
+      method: 'get',
+      url: `v1/cms-client-info/page?count=${count}&page=${page}`,
+    })
+  }
+
   async deleteClient(id) {
     return _axios({
       method: 'delete',

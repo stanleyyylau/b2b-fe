@@ -4,7 +4,7 @@
     <div class="container" v-if="!showEdit">
       <div class="header"><div class="title">产品列表</div></div>
       <!-- 表格 -->
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="tableData" style="width: 100%" v-loading="loading">
         <el-table-column prop="spu_name" label="SPU" width="150"> </el-table-column>
         <el-table-column prop="spu_title" label="商品名称" width="150"> </el-table-column>
         <el-table-column label="产品图片" width="120">
@@ -192,7 +192,9 @@ export default {
     },
     async getProducts() {
       try {
+        this.loading = true
         const products = await product.getProducts()
+        this.loading = false
         this.tableData = products
       } catch (error) {
         if (error.code === 10020) {
@@ -250,6 +252,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       basicAttrList: [
         {
           attr_name: 'projecting size',

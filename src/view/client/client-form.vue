@@ -1,5 +1,5 @@
 <template>
-  <el-row>
+  <el-row v-loading="loadingForEdit">
     <el-col :lg="20" :md="20" :sm="24" :xs="24">
       <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
         <el-form-item label="国家" prop="country">
@@ -125,8 +125,10 @@ export default {
   async created() {
     // this.setUPSpuData()
     if (this.editId && this.editId !== 0) {
+      this.loadingForEdit = true
       await this.initDataForEdit(this.editId)
       await this.setUPSpuData()
+      this.loadingForEdit = false
     }
   },
   methods: {
@@ -151,10 +153,15 @@ export default {
       const countryCode = this.form.country
       const yearCode = String(new Date().getFullYear()).substr(2)
       const companyCode = this.form.company_name
+        .match(/[a-zA-Z0-9]/g)
+        .join('')
         .toUpperCase()
-        .replaceAll(' ')
-        .substr(0, 3)
-      this.form.code = `${countryCode}${yearCode}${companyCode}`
+      // .substr(0, 3)
+      if (companyCode.length < 3) {
+        this.form.code = ''
+      } else {
+        this.form.code = `${countryCode}${yearCode}${companyCode.substr(0, 3)}`
+      }
     },
     async handleClientAdd() {
       this.loading = true
@@ -198,6 +205,7 @@ export default {
   },
   data() {
     return {
+      loadingForEdit: false,
       countryList: country,
       clientLevelOptions: [
         {
@@ -229,6 +237,10 @@ export default {
         {
           value: '品牌商',
           label: '品牌商',
+        },
+        {
+          value: '大C客户',
+          label: '大C客户',
         },
         {
           value: '批发商',

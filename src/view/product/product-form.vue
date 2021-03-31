@@ -5,7 +5,7 @@
       <div class="header">
         <div class="title">{{ editId !== 0 ? '编辑产品' : '新增产品' }}</div>
       </div>
-      <el-row>
+      <el-row v-loading="loadingForEdit">
         <el-col :lg="20" :md="20" :sm="24" :xs="24">
           <el-form :model="form" status-icon ref="form" label-width="100px" @submit.native.prevent>
             <el-form-item label="型号" prop="spu_name" required>
@@ -279,11 +279,13 @@ export default {
   },
   async created() {
     // this.editId = Number(this.$router.history.current.query.id) || 0
+    this.loadingForEdit = true
     await this.getSecondLevelCates()
     await this.getAttrGroups()
     if (this.editId && this.editId !== 0) {
       await this.getProductDetail(this.editId)
     }
+    this.loadingForEdit = false
     this.loading = false
   },
   methods: {
@@ -576,6 +578,7 @@ export default {
   },
   data() {
     return {
+      loadingForEdit: false,
       certOptions: [
         {
           label: 'CE',

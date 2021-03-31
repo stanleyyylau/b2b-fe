@@ -3,7 +3,7 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header"><div class="title">我的客户</div></div>
-      <el-table :data="clients" style="width: 100%">
+      <el-table :data="clients" style="width: 100%" v-loading="loading">
         <el-table-column prop="country" label="国家" width="150"> </el-table-column>
         <el-table-column prop="client_name" label="客户名" width="150"> </el-table-column>
         <el-table-column prop="company_name" label="公司名" width="150"> </el-table-column>
@@ -57,6 +57,12 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pageWrap">
+        <el-footer>
+          <el-pagination background layout="prev, pager, next" @current-change="handlePageChange" :total="totalItems">
+          </el-pagination>
+        </el-footer>
+      </div>
     </div>
 
     <el-drawer
@@ -133,6 +139,9 @@ export default {
         followBy: item.user_id,
       }))
     },
+    handlePageChange(curPage) {
+      this.getClients(curPage)
+    },
     async handleFollowSubmit() {
       this.addingLog = true
       const data = { ...this.followForm, client_id: this.followHistoryId }
@@ -143,8 +152,12 @@ export default {
       this.followForm.star = 0
       await this.loadFollowLog()
     },
-    async getClients() {
-      const res = await client.list()
+    async getClients(page = 0) {
+      this.loading = true
+      const pageRes = await client.page(10, page)
+      this.loading = false
+      this.totalItems = pageRes.total
+      const res = pageRes.items
       this.clients = res.map(item => ({
         ...item,
         contact_methods: JSON.parse(item.contact_methods),
@@ -205,6 +218,8 @@ export default {
   },
   data() {
     return {
+      loading: false,
+      totalItems: 0,
       showDrawerForClientId: 0,
       addingLog: false,
       clients: [],
@@ -280,6 +295,11 @@ export default {
     justify-content: flex-end;
     margin: 20px;
   }
+}
+
+.pageWrap {
+  text-align: right;
+  padding-top: 25px;
 }
 
 .followCards {

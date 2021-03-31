@@ -46,6 +46,7 @@ export default {
   },
   async created() {
     this.parentCateId = Number(this.$router.history.current.query.parentId)
+    this.loading = true
     await this.getTopLevelCates()
     this.loading = false
   },
