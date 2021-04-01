@@ -95,8 +95,8 @@ export const tpl1 = (data, tpl) => {
   const findClientContactMethodbyKey = key => contactMethod.filter(item => item.method === key)[0].detail
 
   let fullTpl = tpl.replace(productTpl, productList)
-  fullTpl = fullTpl.replace('{客户名称}', client_info.company_name)
-  fullTpl = fullTpl.replace('{地址}', client_info.address)
+  fullTpl = fullTpl.replace('{客户名称}', client_info.company_name || 'NOT FOUND')
+  fullTpl = fullTpl.replace('{地址}', client_info.address || 'NOT FOUND')
   fullTpl = fullTpl.replace('{姓名}', client_info.client_name)
   fullTpl = fullTpl.replace('{邮箱}', findClientContactMethodbyKey('邮箱'))
   fullTpl = fullTpl.replaceAll('{手机}', findClientContactMethodbyKey('电话'))
