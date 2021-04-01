@@ -365,7 +365,7 @@ export default {
         carton_size: sku.carton_size,
         skuId: sku.id,
         sku: sku.sku_name,
-        skuName: sku.sku_name,
+        skuName: sku.sku_title,
         rawPrice: sku.raw_price,
         productSize: sku.product_size,
         price: sku.price_list.map(price => ({
