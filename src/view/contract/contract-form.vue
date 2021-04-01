@@ -302,13 +302,22 @@ export default {
       submitForReview: false,
       termOfSale: [
         {
-          value: 'term of sale1',
+          value: 'EXW',
         },
         {
-          value: 'term of sale2',
+          value: 'FOB',
         },
         {
-          value: 'term of sale3',
+          value: 'CIF',
+        },
+        {
+          value: 'CNF',
+        },
+        {
+          value: 'DAP',
+        },
+        {
+          value: 'DDP',
         },
       ],
       spuOptions: [],
