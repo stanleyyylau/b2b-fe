@@ -110,53 +110,74 @@
                         <el-input placeholder="如果你想起一个好记一点的外号" v-model="scope.row.skuName"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="rawPrice" width="200px" label="成本价">
+                    <el-table-column prop="rawPrice" width="200px" label="成本价(¥)">
                       <template slot-scope="scope">
-                        <el-input placeholder="sku成本价" v-model="scope.row.rawPrice"></el-input>
+                        <div class="unit-row">
+                          <el-input placeholder="sku成本价" v-model="scope.row.rawPrice"></el-input>
+                          <span style="margin-left:10px; width: 30px;">¥</span>
+                        </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="productSize" label="Product Size" width="200px">
+                    <el-table-column prop="productSize" label="Product Size(cm)" width="200px">
                       <template slot-scope="scope">
                         <el-input placeholder="product size" v-model="scope.row.productSize"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="size" label="Package Size" width="200px">
+                    <el-table-column prop="size" label="Package Size(cm)" width="200px">
                       <template slot-scope="scope">
                         <el-input placeholder="size" v-model="scope.row.size"></el-input>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="weight" label="Package Weight" width="200px">
+                    <el-table-column prop="weight" label="Package Weight(kg)" width="200px">
                       <template slot-scope="scope">
-                        <el-input placeholder="weight" v-model="scope.row.weight"></el-input>
+                        <div class="unit-row">
+                          <el-input placeholder="weight" v-model="scope.row.weight"></el-input>
+                          <span style="margin-left:10px; width: 30px;">kg</span>
+                        </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="quantity_per_carton" label="quantity_per_carton" width="200px">
+                    <el-table-column prop="quantity_per_carton" label="quantity_per_carton(pcs)" width="200px">
                       <template slot-scope="scope">
-                        <el-input placeholder="quantity_per_carton" v-model="scope.row.quantity_per_carton"></el-input>
+                        <div class="unit-row">
+                          <el-input
+                            placeholder="quantity_per_carton"
+                            v-model="scope.row.quantity_per_carton"
+                          ></el-input>
+                          <span style="margin-left:10px; width: 30px;">pcs</span>
+                        </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="net_weight_per_carton" label="net_weight_per_carton" width="200px">
+                    <el-table-column prop="net_weight_per_carton" label="net_weight_per_carton(kg)" width="200px">
                       <template slot-scope="scope">
-                        <el-input
-                          placeholder="net_weight_per_carton"
-                          v-model="scope.row.net_weight_per_carton"
-                        ></el-input>
+                        <div class="unit-row">
+                          <el-input
+                            placeholder="net_weight_per_carton"
+                            v-model="scope.row.net_weight_per_carton"
+                          ></el-input>
+                          <span style="margin-left:10px; width: 30px;">kg</span>
+                        </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="gross_weight_per_carton" label="gross_weight_per_carton" width="200px">
+                    <el-table-column prop="gross_weight_per_carton" label="gross_weight_per_carton(kg)" width="210px">
                       <template slot-scope="scope">
-                        <el-input
-                          placeholder="gross_weight_per_carton"
-                          v-model="scope.row.gross_weight_per_carton"
-                        ></el-input>
+                        <div class="unit-row">
+                          <el-input
+                            placeholder="gross_weight_per_carton"
+                            v-model="scope.row.gross_weight_per_carton"
+                          ></el-input>
+                          <span style="margin-left:10px; width: 30px;">kg</span>
+                        </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="carton_measurement" label="carton_measurement" width="200px">
+                    <el-table-column prop="carton_measurement" label="carton_measurement(m³)" width="200px">
                       <template slot-scope="scope">
-                        <el-input placeholder="carton_measurement" v-model="scope.row.carton_measurement"></el-input>
+                        <div class="unit-row">
+                          <el-input placeholder="carton_measurement" v-model="scope.row.carton_measurement"></el-input>
+                          <span style="margin-left:10px; width: 30px;">m³</span>
+                        </div>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="carton_size" label="carton_size" width="200px">
+                    <el-table-column prop="carton_size" label="carton_size(cm)" width="200px">
                       <template slot-scope="scope">
                         <el-input placeholder="carton_size" v-model="scope.row.carton_size"></el-input>
                       </template>
@@ -208,6 +229,7 @@
                   editPriceRow.minCount,
                   editPriceRow.maxCount,
                   editPriceRow.prePrice,
+                  editPriceRow.skuId,
                 )
               "
               >添加价格</el-button
@@ -292,6 +314,7 @@ export default {
     findAttrValueById(id, productDetail) {
       const match = productDetail.basic_attr_list.filter(attr => attr.attr_id === id)
       console.log('match is ', match)
+      if (match.length === 0) return ''
       return match[0].attr_value
     },
     async initAttrGroups(groupId, productDetail) {
@@ -502,16 +525,26 @@ export default {
       console.log('new sku list is')
       console.log(this.skuList)
     },
-    handleAddPrice(clientSideId, minCount, maxCount, prePrice) {
-      const targetIndex = this.skuList.findIndex(sku => sku.clientSideId === clientSideId)
-      const target = { ...this.skuList[targetIndex] }
+    handleAddPrice(clientSideId, minCount, maxCount, prePrice, editId) {
+      console.log('hhihi')
+      let target
+      let targetIndex
+      const nenSkuList = [...this.skuList]
+      if (typeof clientSideId === 'undefined') {
+        const match = nenSkuList.filter(item => item.skuId === editId)
+        // eslint-disable-next-line prefer-destructuring
+        target = match[0]
+      } else {
+        targetIndex = nenSkuList.findIndex(sku => sku.clientSideId === clientSideId)
+        target = nenSkuList[targetIndex]
+      }
       target.price.push({
         minCount,
         maxCount,
         price: prePrice,
       })
-      const nenSkuList = [...this.skuList]
-      nenSkuList[targetIndex] = target
+      // const nenSkuList = [...this.skuList]
+      // nenSkuList[targetIndex] = target
       this.skuList = nenSkuList
     },
     async handleProductAdd() {
@@ -727,5 +760,9 @@ export default {
 }
 .setPrice {
   margin-bottom: 15px;
+}
+.unit-row {
+  display: flex;
+  align-items: center;
 }
 </style>
