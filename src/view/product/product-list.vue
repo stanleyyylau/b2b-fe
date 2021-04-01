@@ -155,9 +155,10 @@ import category from '@/model/category'
 export default {
   components: {},
   async created() {
-    await this.getProducts()
     const res = await category.getSecondLevelCategories()
+    this.cates = res
     this.categoryFromServer = res
+    await this.getProducts()
   },
   methods: {
     getCategoryNameById(id) {
@@ -190,12 +191,19 @@ export default {
         }
       })
     },
+    findCateNameById(cateId) {
+      console.log('hihihi')
+      return this.cates.filter(item => String(item.id) === String(cateId))[0].name
+    },
     async getProducts() {
       try {
         this.loading = true
         const products = await product.getProducts()
         this.loading = false
-        this.tableData = products
+        this.tableData = products.map(item => ({
+          ...item,
+          catalog_id: this.findCateNameById(item.catalog_id),
+        }))
       } catch (error) {
         if (error.code === 10020) {
           this.tableData = []
@@ -252,6 +260,7 @@ export default {
   },
   data() {
     return {
+      cates: [],
       loading: false,
       basicAttrList: [
         {
