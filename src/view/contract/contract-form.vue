@@ -187,6 +187,7 @@ export default {
       this.submitForReview = res.review_status === '审核中'
       this.form = {
         ...res,
+        terms_of_sale: res.terms_of_sale.split(','),
         reviewStatus: res.review_status,
         skus: res.skus.map(sku => ({
           spu_sku: [sku.spu_id, sku.sku_id],
@@ -204,6 +205,7 @@ export default {
       this.loading = true
       const data = {
         ...this.form,
+        terms_of_sale: this.form.terms_of_sale.join(','),
         review_status: this.submitForReview ? '审核中' : null,
         skus: this.form.skus.map(item => ({
           spu_id: item.spu_sku[0],
