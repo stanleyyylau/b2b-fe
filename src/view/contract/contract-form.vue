@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row v-loading="loadingForEdit">
       <el-col :lg="20" :md="20" :sm="24" :xs="24">
         <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
           <el-form-item label="合同日期">
@@ -17,24 +17,76 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="总金额">
-            <el-input v-model="form.total_amount"></el-input>
-          </el-form-item>
-          <el-form-item label="实际运费">
-            <el-input v-model="form.actual_delivery_fee"></el-input>
-          </el-form-item>
-          <el-form-item label="其他费用">
-            <el-input v-model="form.other_fee"></el-input>
-          </el-form-item>
           <el-form-item label="收货地址">
-            <el-input v-model="form.delivery_address"></el-input>
+            <el-input v-model="form.delivery_address" placeholder="如不填，则直接显示客户登记地址"></el-input>
           </el-form-item>
-          <el-form-item label="运费">
-            <el-input v-model="form.shipping_cost"></el-input>
-          </el-form-item>
-          <el-form-item label="手续费">
-            <el-input v-model="form.transaction_fee"></el-input>
-          </el-form-item>
+          <el-row>
+            <el-col :span="8">
+              <el-form-item label="总金额">
+                <el-input v-model="form.total_amount">
+                  <template slot="append"
+                    >USD</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="客付运费">
+                <el-input v-model="form.shipping_cost">
+                  <template slot="append"
+                    >USD</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="额外费用">
+                <el-input v-model="form.additional_cost">
+                  <template slot="append"
+                    >USD</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="6">
+              <el-form-item label="手续费">
+                <el-input v-model="form.transaction_fee">
+                  <template slot="append"
+                    >USD</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="保险费">
+                <el-input v-model="form.insurance_cost">
+                  <template slot="append"
+                    >USD</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="支出运费">
+                <el-input v-model="form.actual_delivery_fee">
+                  <template slot="append"
+                    >RMB</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="其他费用">
+                <el-input v-model="form.other_fee" placeholder="除运费外的支出">
+                  <template slot="append"
+                    >RMB</template
+                  >
+                </el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <el-form-item label="Terms">
             <el-select multiple v-model="form.terms_of_sale" placeholder="Select">
               <el-option v-for="item in termOfSale" :key="item.value" :label="item.value" :value="item.value">
@@ -42,20 +94,11 @@
             </el-select>
             <!--            <el-input v-model="form.terms_of_sale"></el-input>-->
           </el-form-item>
-          <el-form-item label="保险费">
-            <el-input v-model="form.insurance_cost"></el-input>
-          </el-form-item>
-          <el-form-item label="额外费用">
-            <el-input v-model="form.additional_cost"></el-input>
-          </el-form-item>
           <el-form-item label="付款方式">
             <el-select v-model="form.payment_method" placeholder="Select">
               <el-option v-for="item in paymentMethodOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="备注">
-            <el-input type="text" v-model="form.notes" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item label="付款状态">
             <el-select v-model="form.payment_status" allow-create placeholder="Select">
@@ -66,7 +109,10 @@
               v-if="form.payment_status === '支付预付款'"
               v-model="form.prepay_amount"
               placeholder="输入预付款金额"
-            ></el-input>
+              ><template slot="append"
+                >USD</template
+              ></el-input
+            >
             <!-- <el-input
               v-if="form.payment_status === '其他'"
               v-model="form.notes"
@@ -78,6 +124,9 @@
             <div v-else>
               <el-checkbox v-if="showSubmitForReview" v-model="submitForReview">提交给 Holly 审核 </el-checkbox>
             </div>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input type="text" v-model="form.notes" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item label="成本价">
             <el-input v-model="form.raw_cost" :disabled="!isAdmin"></el-input>
@@ -108,10 +157,14 @@
                       v-model="scope.row.quantity"
                       placeholder="quantity"
                       @change="onQuantityChange(scope.$index)"
-                    ></el-input>
+                    >
+                      <template slot="append"
+                        >PCS</template
+                      >
+                    </el-input>
                   </template>
                 </el-table-column>
-                <el-table-column label="成本价" width="180" prop="calculatedUnitPrice"> </el-table-column>
+                <el-table-column label="建议零售价" width="180" prop="calculatedUnitPrice"> </el-table-column>
                 <el-table-column label="discount" width="180">
                   <template slot-scope="scope">
                     <el-input
@@ -123,7 +176,11 @@
                 </el-table-column>
                 <el-table-column label="最终价格" width="180">
                   <template slot-scope="scope">
-                    <el-input v-model="scope.row.unit_price"></el-input>
+                    <el-input v-model="scope.row.unit_price">
+                      <template slot="append"
+                        >USD</template
+                      >
+                    </el-input>
                   </template>
                 </el-table-column>
                 <el-table-column label="特殊需求" width="180">
@@ -171,6 +228,7 @@ export default {
   },
   components: {},
   async created() {
+    this.loadingForEdit = true
     await this.getClients()
     await this.getSpus()
     console.log('hihi')
@@ -180,6 +238,7 @@ export default {
     }
     console.log('finish getting client')
     window.contract = this
+    this.loadingForEdit = false
   },
   methods: {
     async getContractDetail(id) {
@@ -298,6 +357,7 @@ export default {
   },
   data() {
     return {
+      loadingForEdit: false,
       isAdmin: false,
       submitForReview: false,
       termOfSale: [
@@ -382,14 +442,14 @@ export default {
         contract_time: new Date(),
         delivery_time: new Date(),
         client_id: null,
-        total_amount: 0,
-        actual_delivery_fee: 0,
+        total_amount: '',
+        actual_delivery_fee: '',
         prepay_amount: null,
-        other_fee: 0,
+        other_fee: '',
         payment_method: '',
         notes: '',
         payment_status: '',
-        raw_cost: 0,
+        raw_cost: '',
         review_status: '',
         skus: [],
       },
@@ -428,6 +488,12 @@ export default {
     display: flex;
   }
 
+  .el-input-group__append,
+  .el-input-group__prepend {
+    background: #a5acbb !important;
+    border: 1px solid #a5acbb !important;
+    color: #fff;
+  }
   .pagination {
     display: flex;
     justify-content: flex-end;

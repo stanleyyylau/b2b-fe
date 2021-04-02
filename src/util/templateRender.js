@@ -255,6 +255,10 @@ export const tpl4 = (data, tpl) => {
     .map(product => {
       let oneProduct = productTpl
       const skuForCurrentProduct = getSkuById(data, product.sku_id)
+      skuForCurrentProduct.net_weight_per_carton = Number(skuForCurrentProduct.net_weight_per_carton).toFixed(2)
+      skuForCurrentProduct.carton_measurement = Number(skuForCurrentProduct.carton_measurement).toFixed(3)
+      // skuForCurrentProduct.net_weight_per_carton = Number(skuForCurrentProduct.net_weight_per_carton).toFixed(3)
+
       oneProduct = oneProduct.replace('{sku-no}', skuForCurrentProduct.sku_name)
       oneProduct = oneProduct.replace('{sku-name}', skuForCurrentProduct.sku_title)
       oneProduct = oneProduct.replace('{qpc}', skuForCurrentProduct.quantity_per_carton)
@@ -268,7 +272,7 @@ export const tpl4 = (data, tpl) => {
       const totalNetWeight = totalCtns * Number(skuForCurrentProduct.net_weight_per_carton)
       const totalGrossWeight = totalCtns * Number(skuForCurrentProduct.gross_weight_per_carton)
       const totalCtnMam = totalCtns * Number(skuForCurrentProduct.carton_measurement)
-      oneProduct = oneProduct.replace('{ctn-ms}', String(totalCtnMam))
+      oneProduct = oneProduct.replace('{ctn-ms}', String(Number(totalCtnMam).toFixed(3)))
       productTotalCount.netWeight += totalNetWeight
       productTotalCount.grossWeight += totalGrossWeight
       productTotalCount.ctnMeasure += totalCtnMam
@@ -281,9 +285,9 @@ export const tpl4 = (data, tpl) => {
   let fullTpl = tpl.replace(productTpl, productList)
   fullTpl = fullTpl.replace('{total-ctns}', productTotalCount.ctns)
   fullTpl = fullTpl.replace('{tt-qty}', productTotalCount.quantity)
-  fullTpl = fullTpl.replace('{tt-nw}', productTotalCount.netWeight)
-  fullTpl = fullTpl.replace('{tt-gw}', productTotalCount.grossWeight)
-  fullTpl = fullTpl.replace('{tt-cm}', productTotalCount.ctnMeasure)
+  fullTpl = fullTpl.replace('{tt-nw}', Number(productTotalCount.netWeight).toFixed(2))
+  fullTpl = fullTpl.replace('{tt-gw}', Number(productTotalCount.grossWeight).toFixed(2))
+  fullTpl = fullTpl.replace('{tt-cm}', Number(productTotalCount.ctnMeasure).toFixed(3))
 
   fullTpl = fullTpl.replaceAll('{Date}', moment().format('MMMM Do, YYYY'))
   const month = new Date().getMonth() + 1 < 10 ? `0${String(new Date().getMonth() + 1)}` : String(new Date().getMonth() + 1)
