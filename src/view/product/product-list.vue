@@ -193,7 +193,11 @@ export default {
     },
     findCateNameById(cateId) {
       console.log('hihihi')
-      return this.cates.filter(item => String(item.id) === String(cateId))[0].name
+      const result = this.cates.filter(item => String(item.id) === String(cateId))
+      if (result.length > 0) {
+        return result[0].name
+      }
+      return `catID: ${cateId} not found`
     },
     async getProducts() {
       try {
