@@ -12,6 +12,13 @@ class Contract {
     })
   }
 
+  async listPending() {
+    return _axios({
+      method: 'get',
+      url: 'v1/ims-contract/listPending',
+    })
+  }
+
   async list() {
     return _axios({
       method: 'get',

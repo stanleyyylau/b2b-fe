@@ -71,7 +71,7 @@ export default {
       })
     },
     async getContract() {
-      const res = await contract.list()
+      const res = await contract.listPending()
       this.tableData = res
     },
     handleDelete(val) {

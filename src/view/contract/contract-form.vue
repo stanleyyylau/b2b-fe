@@ -262,10 +262,12 @@ export default {
     },
     async handleContractAdd() {
       this.loading = true
+      console.log('hihihihii')
       const data = {
         ...this.form,
         terms_of_sale: this.form.terms_of_sale.join(','),
-        review_status: this.submitForReview ? '审核中' : null,
+        // eslint-disable-next-line no-nested-ternary
+        review_status: this.showSubmitForReview ? (this.submitForReview ? '审核中' : null) : this.form.review_status,
         skus: this.form.skus.map(item => ({
           spu_id: item.spu_sku[0],
           sku_id: item.spu_sku[1],
