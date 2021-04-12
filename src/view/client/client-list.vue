@@ -19,6 +19,7 @@
         <el-table-column prop="client_level" label="客户等级" width="120"> </el-table-column>
         <el-table-column prop="industry" label="客户行业" width="120"> </el-table-column>
         <el-table-column prop="source" label="来源" width="120"> </el-table-column>
+        <el-table-column prop="owned_by" label="所属业务员" width="120"> </el-table-column>
         <el-table-column fixed="right" label="Operations" width="200">
           <template slot-scope="scope">
             <div class="operation-row">
@@ -154,15 +155,22 @@ export default {
     },
     async getClients(page = 0) {
       this.loading = true
+      const userRes = await client.listUsers()
+      this.users = userRes
       const pageRes = await client.page(10, page)
       this.loading = false
       this.totalItems = pageRes.total
       const res = pageRes.items
       this.clients = res.map(item => ({
         ...item,
+        owned_by: this.findusernameById(item.owned_by),
         contact_methods: JSON.parse(item.contact_methods),
       }))
       console.log('res is', res)
+    },
+    findusernameById(id) {
+      const match = this.users.filter(item => item.id === id)
+      return match[0].nickname
     },
     handleFollowHistoryClose() {
       this.followHistoryId = 0
@@ -218,6 +226,7 @@ export default {
   },
   data() {
     return {
+      users: [],
       loading: false,
       totalItems: 0,
       showDrawerForClientId: 0,

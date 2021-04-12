@@ -19,6 +19,13 @@ class Client {
     })
   }
 
+  async listUsers() {
+    return _axios({
+      method: 'get',
+      url: 'cms/user/list',
+    })
+  }
+
   async page(count, page) {
     return _axios({
       method: 'get',
