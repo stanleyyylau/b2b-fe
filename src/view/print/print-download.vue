@@ -240,7 +240,7 @@ export default {
 
 <style lang="scss">
 .tiny-wrapper {
-  width: 1000px;
+  width: 680px;
   height: 100%;
   margin: 0 auto;
 }
