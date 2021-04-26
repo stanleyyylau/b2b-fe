@@ -165,15 +165,19 @@ export default {
       let renderResult = ''
       switch (id) {
         case 1:
+        case 5:
           renderResult = tpl1(this.dataForRender, res.template_content)
           break
         case 2:
+        case 6:
           renderResult = tpl2(this.dataForRender, res.template_content)
           break
         case 3:
+        case 7:
           renderResult = tpl3(this.dataForRender, res.template_content)
           break
         case 4:
+        case 8:
           renderResult = tpl4(this.dataForRender, res.template_content)
           break
         default:
