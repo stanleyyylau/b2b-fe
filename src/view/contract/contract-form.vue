@@ -2,27 +2,27 @@
   <div>
     <el-row v-loading="loadingForEdit">
       <el-col :lg="20" :md="20" :sm="24" :xs="24">
-        <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
-          <el-form-item label="合同日期">
+        <el-form :model="form" status-icon ref="form" :rules="dataRule" label-width="150px" @submit.native.prevent>
+          <el-form-item label="合同日期" prop="contract_time">
             <el-date-picker type="date" v-model="form.contract_time" placeholder="Select date and time">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="交货日期">
+          <el-form-item label="交货日期" prop="delivery_time">
             <el-date-picker type="date" v-model="form.delivery_time" placeholder="Select date and time">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="客户">
+          <el-form-item label="客户" prop="client_id">
             <el-select filterable v-model="form.client_id" placeholder="Select">
               <el-option v-for="item in clientOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="收货地址">
+          <el-form-item label="收货地址" prop="delivery_address">
             <el-input v-model="form.delivery_address" placeholder="如不填，则直接显示客户登记地址"></el-input>
           </el-form-item>
           <el-row>
             <el-col :span="8">
-              <el-form-item label="总金额">
+              <el-form-item label="总金额" prop="total_amount">
                 <el-input v-model="form.total_amount">
                   <template slot="append"
                     >USD</template
@@ -31,7 +31,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="客付运费">
+              <el-form-item label="客付运费" prop="shipping_cost">
                 <el-input v-model="form.shipping_cost">
                   <template slot="append"
                     >USD</template
@@ -40,7 +40,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="额外费用">
+              <el-form-item prop="additional_cost" label="额外费用">
                 <el-input v-model="form.additional_cost">
                   <template slot="append"
                     >USD</template
@@ -51,7 +51,7 @@
           </el-row>
           <el-row>
             <el-col :span="6">
-              <el-form-item label="手续费">
+              <el-form-item prop="transaction_fee" label="手续费">
                 <el-input v-model="form.transaction_fee">
                   <template slot="append"
                     >USD</template
@@ -60,7 +60,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="保险费">
+              <el-form-item prop="insurance_cost" label="保险费">
                 <el-input v-model="form.insurance_cost">
                   <template slot="append"
                     >USD</template
@@ -69,7 +69,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="支出运费">
+              <el-form-item prop="actual_delivery_fee" label="支出运费">
                 <el-input v-model="form.actual_delivery_fee">
                   <template slot="append"
                     >RMB</template
@@ -78,7 +78,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="其他费用">
+              <el-form-item prop="other_fee" label="其他费用">
                 <el-input v-model="form.other_fee" placeholder="除运费外的支出">
                   <template slot="append"
                     >RMB</template
@@ -87,20 +87,20 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="Terms">
+          <el-form-item label="Terms" prop="terms_of_sale">
             <el-select multiple v-model="form.terms_of_sale" placeholder="Select">
               <el-option v-for="item in termOfSale" :key="item.value" :label="item.value" :value="item.value">
               </el-option>
             </el-select>
             <!--            <el-input v-model="form.terms_of_sale"></el-input>-->
           </el-form-item>
-          <el-form-item label="付款方式">
+          <el-form-item label="付款方式" prop="payment_method">
             <el-select v-model="form.payment_method" placeholder="Select">
               <el-option v-for="item in paymentMethodOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="付款状态">
+          <el-form-item label="付款状态" prop="payment_status">
             <el-select v-model="form.payment_status" allow-create placeholder="Select">
               <el-option v-for="item in paymentStatusOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
@@ -125,10 +125,10 @@
               <el-checkbox v-if="showSubmitForReview" v-model="submitForReview">提交给 Holly 审核 </el-checkbox>
             </div>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="notes">
             <el-input type="text" v-model="form.notes" placeholder="请输入备注"></el-input>
           </el-form-item>
-          <el-form-item label="成本价">
+          <el-form-item label="成本价" prop="raw_cost">
             <el-input v-model="form.raw_cost" :disabled="!isAdmin"></el-input>
           </el-form-item>
           <el-form-item label="审核状态" v-if="isAdmin">
@@ -261,24 +261,27 @@ export default {
       }
     },
     async handleContractAdd() {
-      this.loading = true
-      console.log('hihihihii')
-      const data = {
-        ...this.form,
-        terms_of_sale: this.form.terms_of_sale.join(','),
-        // eslint-disable-next-line no-nested-ternary
-        review_status: this.showSubmitForReview ? (this.submitForReview ? '审核中' : null) : this.form.review_status,
-        skus: this.form.skus.map(item => ({
-          spu_id: item.spu_sku[0],
-          sku_id: item.spu_sku[1],
-          price: Number(item.unit_price),
-          quantity: Number(item.quantity),
-          special_request: item.special_request,
-        })),
-      }
+      this.$refs.form.validate(valid => {
+        if (!valid) return false
+        this.loading = true
+        console.log('hihihihii')
+        const data = {
+          ...this.form,
+          terms_of_sale: this.form.terms_of_sale.join(','),
+          // eslint-disable-next-line no-nested-ternary
+          review_status: this.showSubmitForReview ? (this.submitForReview ? '审核中' : null) : this.form.review_status,
+          skus: this.form.skus.map(item => ({
+            spu_id: item.spu_sku[0],
+            sku_id: item.spu_sku[1],
+            price: Number(item.unit_price),
+            quantity: Number(item.quantity),
+            special_request: item.special_request,
+          })),
+        }
 
-      console.log('data to send to backend is', data)
-      this.$emit('addOrUpdate', data)
+        console.log('data to send to backend is', data)
+        this.$emit('addOrUpdate', data)
+      })
     },
     async getSpus() {
       const res = await product.getProducts()
@@ -358,10 +361,109 @@ export default {
     },
   },
   data() {
+    const validatePass = (rule, value, callback) => {
+      console.log('check ing')
+      if (value === '') {
+        callback(new Error('请输入密码'))
+      } else {
+        if (this.dataRule.total_amount !== '') {
+          this.$refs.dataRule.validateField('total_amount')
+        }
+        callback()
+      }
+    }
+    const dataForm = {
+      delivery_address: {
+        default: '',
+        rules: [
+          { required: true, message: '收获地址', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' },
+          { validator: validatePass, trigger: 'blur' },
+        ],
+      },
+      shipping_cost: {
+        default: '',
+        rules: [
+          {
+            required: true,
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
+      },
+      transaction_fee: {
+        default: '',
+        rules: [{ required: true, message: '手续费不为空', trigger: 'blur' }],
+      },
+      terms_of_sale: {
+        default: '',
+      },
+      insurance_cost: {
+        default: '',
+      },
+      additional_cost: {
+        default: '',
+      },
+      contract_time: {
+        default: new Date(),
+      },
+      delivery_time: {
+        default: new Date(),
+      },
+      client_id: {
+        default: null,
+      },
+      total_amount: {
+        default: '',
+        rules: [
+          { required: true, message: '请输入总金额', trigger: 'blur' },
+          { validator: validatePass, trigger: 'blur' },
+        ],
+      },
+      actual_delivery_fee: {
+        default: '',
+      },
+      prepay_amount: {
+        default: null,
+      },
+      other_fee: {
+        default: '',
+      },
+      payment_method: {
+        default: '',
+      },
+      notes: {
+        default: '',
+      },
+      payment_status: {
+        default: '',
+      },
+      raw_cost: {
+        default: '',
+      },
+      review_status: {
+        default: '',
+      },
+      skus: {
+        default: [],
+      },
+    }
+    const computedForm = {}
+    const computedRules = {}
+    for (const dataFormKey in dataForm) {
+      console.log('comput')
+      computedForm[dataFormKey] = dataForm[dataFormKey].default
+      if (dataForm[dataFormKey].rules) {
+        computedRules[dataFormKey] = [...dataForm[dataFormKey].rules]
+      }
+    }
     return {
       loadingForEdit: false,
       isAdmin: false,
       submitForReview: false,
+      dataRule: computedRules,
       termOfSale: [
         {
           value: 'EXW',
@@ -434,27 +536,7 @@ export default {
           label: '审核中',
         },
       ],
-      form: {
-        delivery_address: '',
-        shipping_cost: '',
-        transaction_fee: '',
-        terms_of_sale: '',
-        insurance_cost: '',
-        additional_cost: '',
-        contract_time: new Date(),
-        delivery_time: new Date(),
-        client_id: null,
-        total_amount: '',
-        actual_delivery_fee: '',
-        prepay_amount: null,
-        other_fee: '',
-        payment_method: '',
-        notes: '',
-        payment_status: '',
-        raw_cost: '',
-        review_status: '',
-        skus: [],
-      },
+      form: computedForm,
     }
   },
   computed: {

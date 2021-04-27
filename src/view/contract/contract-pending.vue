@@ -2,32 +2,36 @@
   <div>
     <!-- 列表页面 -->
     <div class="container">
-      <div class="header"><div class="title">待审批合同</div></div>
-    </div>
+      <div class="header">
+        <div class="title">待审批合同</div>
+      </div>
 
-    <!-- 表格 -->
-    <el-table :data="tableData" style="width: 100%">
-      <el-table-column prop="contract_time" label="contract_time" width="150"> </el-table-column>
-      <el-table-column prop="delivery_time" label="delivery_time" width="150"> </el-table-column>
-      <el-table-column prop="total_amount" label="total_amount" width="150"> </el-table-column>
-      <el-table-column prop="actual_delivery_fee" label="actual_delivery_fee" width="150"> </el-table-column>
-      <el-table-column prop="payment_method" label="payment_method" width="150"> </el-table-column>
-      <el-table-column prop="payment_status" label="payment_status" width="150"> </el-table-column>
-      <el-table-column prop="raw_cost" label="raw_cost" width="150"> </el-table-column>
-      <el-table-column prop="review_status" label="review_status" width="150"> </el-table-column>
-      <el-table-column prop="client_id" label="client_id" width="150"> </el-table-column>
-      <el-table-column fixed="right" label="Operations" width="200">
-        <template slot-scope="scope">
-          <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
-            审核
-          </el-button>
-          <el-button plain type="primary" size="mini" @click.native.prevent.stop="handlePrint(scope.row.id)">
-            打印
-          </el-button>
-          <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope)">Delete</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+      <!-- 表格 -->
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="contract_time" label="contract_time" width="150"></el-table-column>
+        <el-table-column prop="delivery_time" label="delivery_time" width="150"></el-table-column>
+        <el-table-column prop="total_amount" label="total_amount" width="150"></el-table-column>
+        <el-table-column prop="actual_delivery_fee" label="actual_delivery_fee" width="150"></el-table-column>
+        <el-table-column prop="payment_method" label="payment_method" width="150"></el-table-column>
+        <el-table-column prop="payment_status" label="payment_status" width="150"></el-table-column>
+        <el-table-column prop="raw_cost" label="raw_cost" width="150"></el-table-column>
+        <el-table-column prop="review_status" label="review_status" width="150"></el-table-column>
+        <el-table-column prop="client_id" label="client_id" width="150"></el-table-column>
+        <el-table-column fixed="right" label="Operations" width="200">
+          <template slot-scope="scope">
+            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
+              审核
+            </el-button>
+            <el-button plain type="primary" size="mini" @click.native.prevent.stop="handlePrint(scope.row.id)">
+              打印
+            </el-button>
+            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope)"
+              >Delete
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 

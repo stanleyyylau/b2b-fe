@@ -6,6 +6,8 @@
 
       <!-- 表格 -->
       <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="id" label="id" width="150"> </el-table-column>
+        <el-table-column prop="ownedBy" label="ownedBy" width="150"> </el-table-column>
         <el-table-column prop="contract_time" label="contract_time" width="150"> </el-table-column>
         <el-table-column prop="delivery_time" label="delivery_time" width="150"> </el-table-column>
         <el-table-column prop="total_amount" label="total_amount" width="150"> </el-table-column>
@@ -35,6 +37,7 @@
 
 <script>
 import contract from '@/model/contract'
+import { replaceOwnedByWithName } from '@/util/common'
 
 export default {
   components: {},
@@ -73,7 +76,7 @@ export default {
     },
     async getContract() {
       const res = await contract.list()
-      this.tableData = res
+      this.tableData = await replaceOwnedByWithName(res)
     },
     handleDelete(val) {
       this.$confirm('此操作将永久删除该合同, 是否继续?', '提示', {

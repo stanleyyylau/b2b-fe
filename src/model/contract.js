@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import _axios from '@/lin/plugin/axios'
+import { dateFormatter, filterCNY, filterUSD, replaceOwnedByWithName } from '@/util/common'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
 class Contract {
@@ -13,17 +14,32 @@ class Contract {
   }
 
   async listPending() {
-    return _axios({
+    const res = await _axios({
       method: 'get',
       url: 'v1/ims-contract/listPending',
     })
+    const withOwnBy = await replaceOwnedByWithName(res)
+    return this.contractFilter(withOwnBy)
   }
 
   async list() {
-    return _axios({
+    const res = await _axios({
       method: 'get',
       url: 'v1/ims-contract/list',
     })
+    const withOwnBy = await replaceOwnedByWithName(res)
+    return this.contractFilter(withOwnBy)
+  }
+
+  contractFilter(list) {
+    return list.map(item => ({
+      ...item,
+      total_amount: filterUSD(item.total_amount),
+      actual_delivery_fee: filterCNY(item.actual_delivery_fee),
+      raw_cost: filterCNY(item.raw_cost),
+      contract_time: dateFormatter(item.contract_time),
+      delivery_time: dateFormatter(item.delivery_time),
+    }))
   }
 
   async delete(id) {
