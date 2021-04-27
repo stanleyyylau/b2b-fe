@@ -17,7 +17,7 @@
     </el-header>
 
     <el-main>
-      <div class="tiny-wrapper preview">
+      <div class="tiny-wrapper preview" v-bind:class="{ horizontal: templateId == '2' || templateId == '4' }">
         <div class="iframe-wrapper">
           <iframe
             v-if="isPreview"
@@ -110,7 +110,7 @@ export default {
       switch (type) {
         case 'download':
           console.log('about to download')
-          this.downloadBlob(this.pdfBlob, '12344.pdf')
+          this.downloadBlob(this.pdfBlob, window.document.title)
           break
         case 'goback':
           console.log('about to cancel')
@@ -160,7 +160,14 @@ export default {
       this.loading = true
       const res = await contract.getTemplateById(id)
       console.log('templte is', res)
+      console.log('data for render', this.dataForRender)
       // let fullTpl = res.template_content
+      const printType = res.template_name
+      const companyName = this.dataForRender.client_info.company_name
+      const salesName = this.dataForRender.current_user.nickname
+
+      const fileName = `${printType} for ${companyName} by ${salesName} - Aixin.pdf`
+      window.document.title = fileName
 
       let renderResult = ''
       switch (id) {
@@ -243,6 +250,9 @@ export default {
   width: 680px;
   height: 100%;
   margin: 0 auto;
+}
+.horizontal {
+  width: 1000px;
 }
 .preview {
   padding: 50px;

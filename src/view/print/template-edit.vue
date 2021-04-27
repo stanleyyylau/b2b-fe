@@ -10,7 +10,7 @@
         >保存模版</el-button
       >
     </div>
-    <div class="tiny-wrapper">
+    <div class="tiny-wrapper" v-bind:class="{ horizontal: tplId == '2' || templateId == '4' }">
       <editor
         api-key="5vc2o0hszxchs4ctj9cbuxgjqtuwzqg78a50tiud9jgjmxd7"
         ref="createTinymce"
@@ -78,8 +78,11 @@ export default {
 
 <style lang="scss">
 .tiny-wrapper {
-  width: 1000px;
+  width: 680px;
   margin: 0 auto;
+}
+.horizontal {
+  width: 1000px;
 }
 .control-buttons {
   display: flex;
