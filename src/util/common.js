@@ -76,3 +76,23 @@ export const dateFormatter = nows => {
 export const filterUSD = v => formatMoneyUSD(v)
 
 export const filterCNY = v => formatMoneyCNY(v)
+
+export const priceNumValidatorRules = [
+  {
+    message: '请输入金额, 最多两个小数点',
+    trigger: 'blur',
+    type: 'string',
+    required: true,
+    pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+  },
+]
+
+export const integerValidatorRules = [
+  {
+    message: '必须为正整数',
+    trigger: 'blur',
+    type: 'string',
+    required: true,
+    pattern: /^\d+$/,
+  },
+]

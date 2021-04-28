@@ -105,14 +105,17 @@
               <el-option v-for="item in paymentStatusOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
-            <el-input
+            <el-form-item
+              :required="form.payment_status === '支付预付款'"
+              prop="prepay_amount"
               v-if="form.payment_status === '支付预付款'"
-              v-model="form.prepay_amount"
-              placeholder="输入预付款金额"
-              ><template slot="append"
-                >USD</template
-              ></el-input
             >
+              <el-input v-model="form.prepay_amount" placeholder="输入预付款金额"
+                ><template slot="append"
+                  >USD</template
+                ></el-input
+              >
+            </el-form-item>
             <!-- <el-input
               v-if="form.payment_status === '其他'"
               v-model="form.notes"
@@ -137,60 +140,80 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="关联产品">
+          <el-form-item label="关联产品" prop="skus">
             <el-card class="box-card">
               <el-table :data="form.skus" style="width: 100%">
                 <el-table-column label="sku" width="180">
                   <template slot-scope="scope">
-                    <el-cascader
-                      v-model="scope.row.spu_sku"
-                      :options="spuOptions"
-                      @change="handleSkuSelect(scope.$index)"
-                    >
-                    </el-cascader>
+                    <el-form-item required :prop="`skus[${scope.$index}].spu_sku`">
+                      <el-cascader
+                        v-model="scope.row.spu_sku"
+                        :options="spuOptions"
+                        @change="handleSkuSelect(scope.$index)"
+                      >
+                      </el-cascader>
+                    </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="价格区间" width="180" prop="priceRangeStr"> </el-table-column>
                 <el-table-column label="quantity" width="180">
                   <template slot-scope="scope">
-                    <el-input
-                      v-model="scope.row.quantity"
-                      placeholder="quantity"
-                      @change="onQuantityChange(scope.$index)"
-                    >
-                      <template slot="append"
-                        >PCS</template
+                    <el-form-item :prop="`skus[${scope.$index}].quantity`" :rules="getIntegerValidRules()">
+                      <el-input
+                        v-model="scope.row.quantity"
+                        placeholder="quantity"
+                        @change="onQuantityChange(scope.$index)"
                       >
-                    </el-input>
+                        <template slot="append"
+                          >PCS</template
+                        >
+                      </el-input>
+                    </el-form-item>
                   </template>
                 </el-table-column>
-                <el-table-column label="建议零售价" width="180" prop="calculatedUnitPrice"> </el-table-column>
+                <el-table-column label="建议零售价" width="180" prop="calculatedUnitPrice">
+                  <template slot-scope="scope">
+                    <el-form-item>
+                      <div>
+                        {{ scope.row.calculatedUnitPrice }}
+                      </div>
+                    </el-form-item>
+                  </template>
+                </el-table-column>
                 <el-table-column label="discount" width="180">
                   <template slot-scope="scope">
-                    <el-input
-                      v-model="scope.row.discount"
-                      placeholder="0.85"
-                      @change="handleDiscount(scope.$index)"
-                    ></el-input>
+                    <el-form-item :prop="`skus[${scope.$index}].discount`" :rules="getDiscountValidRules()">
+                      <el-input
+                        v-model="scope.row.discount"
+                        placeholder="0.85"
+                        @change="handleDiscount(scope.$index)"
+                      ></el-input>
+                    </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="最终价格" width="180">
                   <template slot-scope="scope">
-                    <el-input v-model="scope.row.unit_price">
-                      <template slot="append"
-                        >USD</template
-                      >
-                    </el-input>
+                    <el-form-item :prop="`skus[${scope.$index}].unit_price`" :rules="getPriceValidRules()">
+                      <el-input v-model="scope.row.unit_price">
+                        <template slot="append"
+                          >USD</template
+                        >
+                      </el-input>
+                    </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="特殊需求" width="180">
                   <template slot-scope="scope">
-                    <el-input v-model="scope.row.special_request" placeholder="special_request"></el-input>
+                    <el-form-item>
+                      <el-input v-model="scope.row.special_request" placeholder="special_request"></el-input>
+                    </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" width="180">
                   <template slot-scope="scope">
-                    <el-button @click="deleteSku(scope.$index)">删除</el-button>
+                    <el-form-item>
+                      <el-button @click="deleteSku(scope.$index)">删除</el-button>
+                    </el-form-item>
                   </template>
                 </el-table-column>
               </el-table>
@@ -201,7 +224,7 @@
           </el-form-item>
           <el-form-item style="padding-bottom: 50px">
             <el-button type="primary" v-on:click="handleContractAdd" :loading="loading">{{
-              contractId === '0' ? '新增合同' : '修改合同'
+              editId === 0 ? '新增合同' : '修改合同'
             }}</el-button>
           </el-form-item>
         </el-form>
@@ -214,8 +237,10 @@
 import client from '@/model/client'
 import product from '@/model/product'
 import contract from '@/model/contract'
+import { integerValidatorRules, priceNumValidatorRules } from '@/util/common'
 
 export default {
+  priceNumValidatorRules,
   props: {
     editId: {
       type: Number,
@@ -241,17 +266,37 @@ export default {
     this.loadingForEdit = false
   },
   methods: {
+    getPriceValidRules() {
+      return priceNumValidatorRules
+    },
+    getIntegerValidRules() {
+      return integerValidatorRules
+    },
+    getDiscountValidRules() {
+      return [
+        {
+          type: 'string',
+          message: '选填,请输入数字',
+          pattern: /^[0-9]+(\.[0-9]{1,9})?$/,
+        },
+      ]
+    },
     async getContractDetail(id) {
       const res = await contract.getDetail(id)
       this.submitForReview = res.review_status === '审核中'
+      for (const key in res) {
+        if (typeof res[key] === 'number') {
+          res[key] = String(res[key])
+        }
+      }
       this.form = {
         ...res,
         terms_of_sale: res.terms_of_sale.split(','),
         reviewStatus: res.review_status,
         skus: res.skus.map(sku => ({
           spu_sku: [sku.spu_id, sku.sku_id],
-          quantity: sku.quantity,
-          unit_price: sku.price,
+          quantity: String(sku.quantity),
+          unit_price: String(sku.price),
           calculatedUnitPrice: '',
           priceRangeStr: '',
           priceList: [],
@@ -261,27 +306,25 @@ export default {
       }
     },
     async handleContractAdd() {
-      this.$refs.form.validate(valid => {
-        if (!valid) return false
-        this.loading = true
-        console.log('hihihihii')
-        const data = {
-          ...this.form,
-          terms_of_sale: this.form.terms_of_sale.join(','),
-          // eslint-disable-next-line no-nested-ternary
-          review_status: this.showSubmitForReview ? (this.submitForReview ? '审核中' : null) : this.form.review_status,
-          skus: this.form.skus.map(item => ({
-            spu_id: item.spu_sku[0],
-            sku_id: item.spu_sku[1],
-            price: Number(item.unit_price),
-            quantity: Number(item.quantity),
-            special_request: item.special_request,
-          })),
-        }
+      const isValid = await this.$refs.form.validate()
+      if (!isValid) return false
+      this.loading = true
+      const data = {
+        ...this.form,
+        terms_of_sale: this.form.terms_of_sale.join(','),
+        // eslint-disable-next-line no-nested-ternary
+        review_status: this.showSubmitForReview ? (this.submitForReview ? '审核中' : null) : this.form.review_status,
+        skus: this.form.skus.map(item => ({
+          spu_id: item.spu_sku[0],
+          sku_id: item.spu_sku[1],
+          price: Number(item.unit_price),
+          quantity: Number(item.quantity),
+          special_request: item.special_request,
+        })),
+      }
 
-        console.log('data to send to backend is', data)
-        this.$emit('addOrUpdate', data)
-      })
+      console.log('data to send to backend is', data)
+      this.$emit('addOrUpdate', data)
     },
     async getSpus() {
       const res = await product.getProducts()
@@ -361,25 +404,9 @@ export default {
     },
   },
   data() {
-    const validatePass = (rule, value, callback) => {
-      console.log('check ing')
-      if (value === '') {
-        callback(new Error('请输入密码'))
-      } else {
-        if (this.dataRule.total_amount !== '') {
-          this.$refs.dataRule.validateField('total_amount')
-        }
-        callback()
-      }
-    }
     const dataForm = {
       delivery_address: {
         default: '',
-        rules: [
-          { required: true, message: '收获地址', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' },
-          { validator: validatePass, trigger: 'blur' },
-        ],
       },
       shipping_cost: {
         default: '',
@@ -395,59 +422,125 @@ export default {
       },
       transaction_fee: {
         default: '',
-        rules: [{ required: true, message: '手续费不为空', trigger: 'blur' }],
+        rules: [{ pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: '请输入金额, 最多两个小数点', trigger: 'blur' }],
       },
       terms_of_sale: {
         default: '',
+        rules: [{ required: true, trigger: 'blur' }],
       },
       insurance_cost: {
         default: '',
+        rules: [
+          {
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
       },
       additional_cost: {
         default: '',
+        rules: [
+          {
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
       },
       contract_time: {
         default: new Date(),
+        rules: [{ required: true, trigger: 'blur' }],
       },
       delivery_time: {
         default: new Date(),
+        rules: [{ required: true, trigger: 'blur' }],
       },
       client_id: {
         default: null,
+        rules: [{ required: true, trigger: 'blur' }],
       },
       total_amount: {
         default: '',
         rules: [
-          { required: true, message: '请输入总金额', trigger: 'blur' },
-          { validator: validatePass, trigger: 'blur' },
+          {
+            required: true,
+            message: '请输入总金额',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
         ],
       },
       actual_delivery_fee: {
         default: '',
+        rules: [
+          {
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
       },
       prepay_amount: {
         default: null,
+        rules: [
+          {
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
       },
       other_fee: {
         default: '',
+        rules: [
+          {
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
       },
       payment_method: {
         default: '',
+        rules: [{ required: true, trigger: 'blur' }],
       },
       notes: {
         default: '',
       },
       payment_status: {
         default: '',
+        rules: [{ required: true, trigger: 'blur' }],
       },
       raw_cost: {
         default: '',
+        rules: [
+          {
+            message: '请输入金额, 最多两个小数点',
+            trigger: 'blur',
+            type: 'string',
+            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+          },
+        ],
       },
       review_status: {
         default: '',
       },
       skus: {
         default: [],
+        rules: [
+          {
+            type: 'array',
+            required: true,
+            message: '关联产品不能为空',
+          },
+        ],
       },
     }
     const computedForm = {}
