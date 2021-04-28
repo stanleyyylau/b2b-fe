@@ -2,13 +2,13 @@
   <el-row v-loading="loadingForEdit">
     <el-col :lg="20" :md="20" :sm="24" :xs="24">
       <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
-        <el-form-item label="国家" prop="country">
+        <el-form-item label="国家" prop="country" required>
           <el-select filterable v-model="form.country" placeholder="Select" @change="generateClientCode">
             <el-option v-for="item in countryList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="产品分类" prop="category">
+        <el-form-item label="产品分类" prop="category" required>
           <el-select filterable v-model="form.category" placeholder="Select">
             <el-option v-for="(item, index) in categoryOptions" :key="index" :label="item.value" :value="item.value">
             </el-option>
@@ -17,7 +17,7 @@
         <el-form-item label="地址">
           <el-input size="medium" placeholder="地址" v-model="form.address"></el-input>
         </el-form-item>
-        <el-form-item label="客户名" prop="client_name">
+        <el-form-item label="客户名" prop="client_name" required>
           <el-input
             size="medium"
             placeholder="client_name"
@@ -25,7 +25,7 @@
             @change="generateClientCode"
           ></el-input>
         </el-form-item>
-        <el-form-item label="公司名" prop="company_name">
+        <el-form-item label="公司名" prop="company_name" required>
           <el-input
             @change="generateClientCode"
             size="medium"
@@ -76,7 +76,7 @@
             </div>
           </el-card>
         </el-form-item>
-        <el-form-item label="客户代码" prop="code">
+        <el-form-item label="客户代码" prop="code" required>
           <el-input size="medium" placeholder="code" v-model="form.code"></el-input>
         </el-form-item>
         <el-form-item label="等级" prop="client_level">
@@ -170,6 +170,8 @@ export default {
       }
     },
     async handleClientAdd() {
+      const isValid = await this.$refs.form.validate()
+      if (!isValid) return
       this.loading = true
       console.log('this form is', this.form)
       const transformedForm = {

@@ -112,7 +112,8 @@ const deepReduceName = target => {
       // eslint-disable-next-line no-param-reassign
       target.name = target.name || Utils.getRandomStr()
       // eslint-disable-next-line no-param-reassign
-      target.name = Symbol(target.name)
+      // todo: bug: below code cause vue router can't navigate by route name
+      // target.name = Symbol(target.name)
     }
 
     if (Array.isArray(target.children)) {

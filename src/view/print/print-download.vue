@@ -44,6 +44,7 @@
 
 <script>
 import Editor from '@tinymce/tinymce-vue'
+import Vue from 'vue'
 import contract from '@/model/contract'
 // import client from '@/model/client'
 import product from '@/model/product'
@@ -170,27 +171,35 @@ export default {
       window.document.title = fileName
 
       let renderResult = ''
-      switch (id) {
-        case 1:
-        case 5:
-          renderResult = tpl1(this.dataForRender, res.template_content)
-          break
-        case 2:
-        case 6:
-          renderResult = tpl2(this.dataForRender, res.template_content)
-          break
-        case 3:
-        case 7:
-          renderResult = tpl3(this.dataForRender, res.template_content)
-          break
-        case 4:
-        case 8:
-          renderResult = tpl4(this.dataForRender, res.template_content)
-          break
-        default:
-          break
+      try {
+        switch (id) {
+          case 1:
+          case 5:
+            renderResult = tpl1(this.dataForRender, res.template_content)
+            break
+          case 2:
+          case 6:
+            renderResult = tpl2(this.dataForRender, res.template_content)
+            break
+          case 3:
+          case 7:
+            renderResult = tpl3(this.dataForRender, res.template_content)
+            break
+          case 4:
+          case 8:
+            renderResult = tpl4(this.dataForRender, res.template_content)
+            break
+          default:
+            break
+        }
+      } catch (e) {
+        Vue.prototype.$message({
+          message: '合同缺失数据，请仔细检查合同，客户以及产品信息',
+          duration: 5000,
+          type: 'error',
+        })
+        console.log('合同缺失数据', e)
       }
-
       this.content = renderResult
       this.loading = false
     },

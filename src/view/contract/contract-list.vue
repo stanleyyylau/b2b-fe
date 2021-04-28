@@ -7,6 +7,11 @@
       <!-- 表格 -->
       <el-table :data="tableData" style="width: 100%">
         <el-table-column prop="id" label="id" width="150"> </el-table-column>
+        <el-table-column prop="pino" label="PI No" width="150">
+          <template slot-scope="scope">
+            {{ scope.row.pino ? scope.row.pino : '无 PI NO' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="ownedBy" label="ownedBy" width="150"> </el-table-column>
         <el-table-column prop="contract_time" label="contract_time" width="150"> </el-table-column>
         <el-table-column prop="delivery_time" label="delivery_time" width="150"> </el-table-column>

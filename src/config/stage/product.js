@@ -101,6 +101,16 @@ const productRouter = {
       inNav: false,
       icon: 'iconfont icon-tushuguanli',
     },
+
+    {
+      title: '产品预览',
+      type: 'view',
+      name: 'ProductPreview',
+      route: '/product/preview',
+      filePath: 'view/product/product-preview.vue',
+      inNav: false,
+      icon: 'iconfont icon-tushuguanli',
+    },
   ],
 }
 

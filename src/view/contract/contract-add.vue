@@ -20,9 +20,15 @@ export default {
   methods: {
     async handleAdd(data) {
       this.loading = true
-      await contract.create(data)
-      this.loading = false
-      this.$router.back()
+      try {
+        const res = await contract.create(data)
+        console.log('res', res)
+        this.loading = false
+        this.$router.back()
+      } catch (e) {
+        console.log('e', e)
+        this.loading = false
+      }
     },
   },
   data() {

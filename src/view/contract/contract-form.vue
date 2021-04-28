@@ -359,7 +359,7 @@ export default {
     async getClients() {
       const res = await client.list()
       this.clientOptions = res.map(item => ({
-        value: item.id,
+        value: String(item.id),
         label: item.client_name,
       }))
       console.log('this.clientOptions', this.clientOptions)
