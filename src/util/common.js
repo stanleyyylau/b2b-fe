@@ -96,3 +96,16 @@ export const integerValidatorRules = [
     pattern: /^\d+$/,
   },
 ]
+
+export const isObjNotEmpty = obj => {
+  if (typeof obj === 'object') {
+    let result = false
+    for (const key in obj) {
+      if (key) {
+        result = true
+      }
+    }
+    return result
+  }
+  return Boolean(obj)
+}

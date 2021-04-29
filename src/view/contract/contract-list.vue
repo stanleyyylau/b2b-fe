@@ -3,9 +3,72 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header"><div class="title">我的合同</div></div>
-
+      <div class="search">
+        <el-form :inline="true" class="form-inline" ref="searchForm" :model="searchForm">
+          <el-form-item label="owned_by :" prop="owned_by">
+            <el-select
+              placeholder="owned_by"
+              :loading="searchFormMeta.ownByLoading"
+              v-model="searchForm.owned_by"
+              clearable
+            >
+              <el-option
+                v-for="item in searchFormMeta.ownByOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="PI_NO :" prop="PI_NO">
+            <el-input placeholder="PI_NO" v-model="searchForm.PI_NO"></el-input>
+          </el-form-item>
+          <el-form-item label="payment_status :" prop="payment_status">
+            <el-select placeholder="payment_status" v-model="searchForm.payment_status" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.payment_statusOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="review_status :" prop="review_status">
+            <el-select placeholder="review_status" v-model="searchForm.review_status" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.review_statusOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="payment_method :" prop="payment_method">
+            <el-select placeholder="payment_method" v-model="searchForm.payment_method" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.payment_methodOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-tooltip class="item" effect="dark" content="按条件进行 AND 查询" placement="top">
+              <el-button type="primary" @click="onSearch" :disabled="loading">查询</el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="清空搜索输入值并重新查询" placement="top">
+              <el-button type="primary" @click="onReset" :disabled="loading">重置</el-button>
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
+      </div>
       <!-- 表格 -->
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="tableData" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="id" width="150"> </el-table-column>
         <el-table-column prop="pino" label="PI No" width="150">
           <template slot-scope="scope">
@@ -42,13 +105,14 @@
 
 <script>
 import contract from '@/model/contract'
-import { replaceOwnedByWithName } from '@/util/common'
+import client from '@/model/client'
 
 export default {
   components: {},
   async created() {
     this.loading = true
     await this.getContract()
+    this.initSearchForm()
     this.operate = [
       { name: '编辑', func: 'handleEdit', type: 'primary' },
       {
@@ -61,6 +125,17 @@ export default {
     this.loading = false
   },
   methods: {
+    onReset() {
+      this.$refs.searchForm.resetFields()
+      this.onSearch()
+    },
+    async initSearchForm() {
+      this.searchFormMeta.ownByLoading = true
+      const userOptions = await client.listUserOptions()
+      this.searchFormMeta.ownByLoading = false
+      console.log(userOptions)
+      this.searchFormMeta.ownByOptions = userOptions
+    },
     handlePrint(id) {
       this.$router.push({
         path: '/download',
@@ -68,6 +143,12 @@ export default {
           contractId: id,
         },
       })
+    },
+    async onSearch() {
+      this.loading = true
+      const res = await contract.search(this.searchForm)
+      this.loading = false
+      this.tableData = res
     },
     handleEdit(val) {
       console.log('val', val)
@@ -80,8 +161,10 @@ export default {
       })
     },
     async getContract() {
+      this.loading = true
       const res = await contract.list()
-      this.tableData = await replaceOwnedByWithName(res)
+      this.loading = false
+      this.tableData = res
     },
     handleDelete(val) {
       this.$confirm('此操作将永久删除该合同, 是否继续?', '提示', {
@@ -113,6 +196,68 @@ export default {
         { prop: 'review_status', label: '审核状态' },
         { prop: 'client_id', label: '客户ID' },
       ],
+      searchFormMeta: {
+        ownByLoading: true,
+        ownByOptions: [],
+        payment_statusOptions: [
+          {
+            value: '支付预付款',
+            label: '支付预付款',
+          },
+          {
+            value: '款项收齐',
+            label: '款项收齐',
+          },
+          {
+            value: '其他',
+            label: '其他',
+          },
+        ],
+        review_statusOptions: [
+          {
+            value: '已审核',
+            label: '已审核',
+          },
+          {
+            value: '拒绝',
+            label: '拒绝',
+          },
+          {
+            value: '审核中',
+            label: '审核中',
+          },
+        ],
+        payment_methodOptions: [
+          {
+            value: '阿里信保',
+            label: '阿里信保',
+          },
+          {
+            value: '美金账户',
+            label: '美金账户',
+          },
+          {
+            value: 'PayPal',
+            label: 'PayPal',
+          },
+          {
+            value: '人民币私账',
+            label: '人民币私账',
+          },
+          {
+            value: '1688',
+            label: '1688',
+          },
+        ],
+      },
+      searchForm: {
+        owned_by: null,
+        PI_NO: null,
+        payment_status: null,
+        review_status: null,
+        payment_method: null,
+      },
+      loading: true,
       tableData: [],
       operate: [],
       showEdit: false,

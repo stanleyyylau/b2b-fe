@@ -26,6 +26,14 @@ class Client {
     })
   }
 
+  async listUserOptions() {
+    const users = await this.listUsers()
+    return users.map(user => ({
+      label: user.nickname,
+      value: user.id,
+    }))
+  }
+
   async page(count, page) {
     return _axios({
       method: 'get',

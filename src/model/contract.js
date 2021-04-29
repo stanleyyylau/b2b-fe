@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import _axios from '@/lin/plugin/axios'
-import { dateFormatter, filterCNY, filterUSD, replaceOwnedByWithName } from '@/util/common'
+import { dateFormatter, filterCNY, filterUSD, isObjNotEmpty, replaceOwnedByWithName } from '@/util/common'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
 class Contract {
@@ -92,6 +92,22 @@ class Contract {
       url: 'v1/ims-print-template',
       data,
     })
+  }
+
+  async search(params) {
+    const data = {}
+    for (const key in params) {
+      if (isObjNotEmpty(params[key])) {
+        data[key] = params[key]
+      }
+    }
+    const res = await _axios({
+      method: 'post',
+      url: 'v1/ims-contract/searchlist',
+      data,
+    })
+    const withOwnBy = await replaceOwnedByWithName(res)
+    return this.contractFilter(withOwnBy)
   }
 }
 
