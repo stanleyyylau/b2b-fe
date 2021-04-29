@@ -10,6 +10,16 @@ const adminRouter = {
   permission: ['超级管理员独有权限'],
   children: [
     {
+      title: 'template example',
+      type: 'view',
+      name: 'template',
+      route: '/template',
+      filePath: 'view/contract/data-template.vue',
+      inNav: true,
+      permission: ['超级管理员独有权限'],
+      icon: 'iconfont icon-tushuguanli',
+    },
+    {
       route: '/admin/user/list',
       name: null,
       title: '用户管理',
