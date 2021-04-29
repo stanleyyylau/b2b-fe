@@ -113,7 +113,11 @@
 <script>
 import product from '@/model/product'
 import client from '@/model/client'
-import country from '@/util/country'
+import { clientCategoryOptions,
+  clientCountryOptions,
+  clientIndustryOptions,
+  clientLevelOptions,
+  clientSourceOptions } from '@/util/common'
 
 export default {
   props: {
@@ -213,92 +217,12 @@ export default {
   },
   data() {
     return {
-      categoryOptions: [
-        {
-          value: '口罩（防疫物资）',
-        },
-        {
-          value: '搜索引擎',
-        },
-        {
-          value: '金属卡包',
-        },
-        {
-          value: '3C电子 （耳机，音箱，充电线）',
-        },
-      ],
+      categoryOptions: clientCategoryOptions,
       loadingForEdit: false,
-      countryList: country,
-      clientLevelOptions: [
-        {
-          value: 'AAA 大客户',
-          label: 'AAA 大客户',
-        },
-        {
-          value: 'AA 已下单客户',
-          label: 'AA 已下单客户',
-        },
-        {
-          value: 'A 重要客户',
-          label: 'A 重要客户',
-        },
-        {
-          value: 'B 意向客户',
-          label: 'B 意向客户',
-        },
-        {
-          value: 'C 普通客户',
-          label: 'C 普通客户',
-        },
-        {
-          value: 'D 非优先客户',
-          label: 'D 非优先客户',
-        },
-      ],
-      clientIndustryOptions: [
-        {
-          value: '品牌商',
-          label: '品牌商',
-        },
-        {
-          value: '大C客户',
-          label: '大C客户',
-        },
-        {
-          value: '批发商',
-          label: '批发商',
-        },
-        {
-          value: '电商客户',
-          label: '电商客户',
-        },
-        {
-          value: '贸易商',
-          label: '贸易商',
-        },
-        {
-          value: '新入行',
-          label: '新入行',
-        },
-        {
-          value: '未知',
-          label: '未知',
-        },
-      ],
-      clientSourceOptions: [
-        {
-          value: '阿里',
-          label: '阿里',
-        },
-        {
-          value: '开发信',
-          label: '开发信',
-        },
-        {
-          value: '官网',
-          label: '官网',
-        },
-      ],
+      countryList: clientCountryOptions,
+      clientLevelOptions,
+      clientIndustryOptions,
+      clientSourceOptions,
       clientInterestProductOptions: [
         {
           value: '0',

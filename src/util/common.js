@@ -1,5 +1,6 @@
 import * as accounting from 'accounting-js'
-import Client from '@/model/client'
+import _axios from 'lin/plugin/axios'
+import country from '@/util/country'
 
 const formatMoneyUSD = amount => `${accounting.formatMoney(amount, 'US$')}`
 const formatMoneyCNY = amount => `${accounting.formatMoney(amount, { symbol: '¥', format: '%s%v' })}`
@@ -10,10 +11,15 @@ function checkAddZone(num) {
 
 // eslint-disable-next-line import/prefer-default-export
 export const replaceOwnedByWithName = async list => {
-  const res = await Client.listUsers()
-  const users = res
+  const users = await _axios({
+    method: 'get',
+    url: 'cms/user/list',
+  })
   return list.map(item => ({
     ...item,
+    owned_by: users.filter(user => user.id === item.owned_by)[0]
+      ? users.filter(user => user.id === item.owned_by)[0].nickname
+      : '',
     ownedBy: users.filter(user => user.id === item.owned_by)[0]
       ? users.filter(user => user.id === item.owned_by)[0].nickname
       : '',
@@ -109,3 +115,97 @@ export const isObjNotEmpty = obj => {
   }
   return Boolean(obj)
 }
+
+export const clientLevelOptions = [
+  {
+    value: 'AAA 大客户',
+    label: 'AAA 大客户',
+  },
+  {
+    value: 'AA 已下单客户',
+    label: 'AA 已下单客户',
+  },
+  {
+    value: 'A 重要客户',
+    label: 'A 重要客户',
+  },
+  {
+    value: 'B 意向客户',
+    label: 'B 意向客户',
+  },
+  {
+    value: 'C 普通客户',
+    label: 'C 普通客户',
+  },
+  {
+    value: 'D 非优先客户',
+    label: 'D 非优先客户',
+  },
+]
+
+export const clientIndustryOptions = [
+  {
+    value: '品牌商',
+    label: '品牌商',
+  },
+  {
+    value: '大C客户',
+    label: '大C客户',
+  },
+  {
+    value: '批发商',
+    label: '批发商',
+  },
+  {
+    value: '电商客户',
+    label: '电商客户',
+  },
+  {
+    value: '贸易商',
+    label: '贸易商',
+  },
+  {
+    value: '新入行',
+    label: '新入行',
+  },
+  {
+    value: '未知',
+    label: '未知',
+  },
+]
+
+export const clientSourceOptions = [
+  {
+    value: '阿里',
+    label: '阿里',
+  },
+  {
+    value: '开发信',
+    label: '开发信',
+  },
+  {
+    value: '官网',
+    label: '官网',
+  },
+]
+
+export const clientCountryOptions = country
+
+export const clientCategoryOptions = [
+  {
+    value: '口罩（防疫物资）',
+    label: '口罩（防疫物资）',
+  },
+  {
+    value: '搜索引擎',
+    label: '搜索引擎',
+  },
+  {
+    value: '金属卡包',
+    label: '金属卡包',
+  },
+  {
+    value: '3C电子 （耳机，音箱，充电线）',
+    label: '3C电子 （耳机，音箱，充电线）',
+  },
+]

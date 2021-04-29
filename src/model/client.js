@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import _axios from '@/lin/plugin/axios'
+import { isObjNotEmpty, replaceOwnedByWithName } from '@/util/common'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
 class Client {
@@ -34,11 +35,31 @@ class Client {
     }))
   }
 
-  async page(count, page) {
-    return _axios({
-      method: 'get',
-      url: `v1/cms-client-info/page?count=${count}&page=${page}`,
+  async page(count, curPage, params) {
+    const data = {}
+    for (const key in params) {
+      if (isObjNotEmpty(params[key])) {
+        data[key] = params[key]
+      }
+    }
+    const res = await _axios({
+      method: 'post',
+      url: `v1/cms-client-info/page?count=${count}&page=${curPage}`,
+      data,
     })
+    const filterResult = await this.postFilterContractList(res.items)
+    return {
+      ...res,
+      items: filterResult,
+    }
+  }
+
+  async postFilterContractList(list) {
+    const withOwnBy = await replaceOwnedByWithName(list)
+    return withOwnBy.map(item => ({
+      ...item,
+      contact_methods: JSON.parse(item.contact_methods),
+    }))
   }
 
   async deleteClient(id) {

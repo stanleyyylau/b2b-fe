@@ -20,7 +20,7 @@ const clientRouter = {
     {
       title: '我的客户',
       type: 'view',
-      name: 'MyClients',
+      name: 'MyClientsMy',
       route: '/client/my',
       filePath: 'view/client/client-list.vue',
       inNav: true,
@@ -34,7 +34,7 @@ const clientRouter = {
       filePath: 'view/client/client-edit.vue',
       inNav: false,
       icon: 'iconfont icon-tushuguanli',
-    }
+    },
   ],
 }
 

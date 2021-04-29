@@ -3,7 +3,103 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header"><div class="title">我的客户</div></div>
+
+      <div class="search">
+        <el-form :inline="true" class="form-inline" ref="searchForm" :model="searchForm">
+          <el-form-item label="owned_by :" prop="owned_by">
+            <el-select
+              placeholder="owned_by"
+              :loading="searchFormMeta.ownByLoading"
+              v-model="searchForm.owned_by"
+              clearable
+              multiple
+            >
+              <el-option
+                v-for="item in searchFormMeta.ownByOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="client_name :" prop="client_name">
+            <el-input placeholder="client_name" v-model="searchForm.client_name"></el-input>
+          </el-form-item>
+          <el-form-item label="company_name :" prop="company_name">
+            <el-input placeholder="company_name" v-model="searchForm.company_name"></el-input>
+          </el-form-item>
+          <el-form-item label="code :" prop="code">
+            <el-input placeholder="code" v-model="searchForm.code"></el-input>
+          </el-form-item>
+          <el-form-item label="client_level :" prop="client_level">
+            <el-select placeholder="client_level" v-model="searchForm.client_level" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.client_levelOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="industry :" prop="industry">
+            <el-select placeholder="industry" v-model="searchForm.industry" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.industryOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="source :" prop="source">
+            <el-select placeholder="source" v-model="searchForm.source" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.sourceOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="country :" prop="country">
+            <el-select placeholder="country" v-model="searchForm.country" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.countryOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="category :" prop="category">
+            <el-select placeholder="category" v-model="searchForm.category" clearable multiple>
+              <el-option
+                v-for="item in searchFormMeta.categoryOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-tooltip class="item" effect="dark" content="按条件进行 AND 查询" placement="top">
+              <el-button type="primary" @click="onSearch" :disabled="loading">查询</el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="清空搜索输入值并重新查询" placement="top">
+              <el-button type="primary" @click="onReset" :disabled="loading">重置</el-button>
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
+      </div>
+
       <el-table :data="clients" style="width: 100%" v-loading="loading">
+        <el-table-column prop="code" label="客户代码" width="150"> </el-table-column>
         <el-table-column prop="country" label="国家" width="150"> </el-table-column>
         <el-table-column prop="client_name" label="客户名" width="150"> </el-table-column>
         <el-table-column prop="company_name" label="公司名" width="150"> </el-table-column>
@@ -60,8 +156,20 @@
       </el-table>
       <div class="pageWrap">
         <el-footer>
-          <el-pagination background layout="prev, pager, next" @current-change="handlePageChange" :total="totalItems">
-          </el-pagination>
+          <!-- 分页 -->
+          <div class="pagination">
+            <el-pagination
+              @current-change="handleCurrentChange"
+              :background="true"
+              :page-size="pageCount"
+              :current-page="currentPage"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total_nums"
+              :page-sizes="pageSizes"
+              @size-change="handleSizeChange"
+            >
+            </el-pagination>
+          </div>
         </el-footer>
       </div>
     </div>
@@ -116,13 +224,25 @@
 import client from '@/model/client'
 import product from '@/model/product'
 import fileAttachment from '@/component/common/file-attachment'
+import { clientCategoryOptions,
+  clientCountryOptions,
+  clientIndustryOptions,
+  clientLevelOptions,
+  clientSourceOptions } from '@/util/common'
 
 export default {
   components: {
     fileAttachment,
   },
   created() {
-    this.getClients()
+    // todo: need user input sanitazation
+    this.pageCount = Number(this.$route.query.pageCount) || this.pageCount
+    this.currentPage = Number(this.$route.query.currentPage) || this.currentPage
+    if (!this.pageSizes.includes(Number(this.pageCount))) {
+      this.pageSizes = [this.pageCount].concat(this.pageSizes)
+    }
+    this.onSearch()
+    this.initSearchForm()
   },
   computed: {
     showFollowHistory() {
@@ -130,6 +250,39 @@ export default {
     },
   },
   methods: {
+    async initSearchForm() {
+      this.searchFormMeta.ownByLoading = true
+      const userOptions = await client.listUserOptions()
+      this.searchFormMeta.ownByLoading = false
+      this.searchFormMeta.ownByOptions = userOptions
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.onSearch()
+    },
+    handleSizeChange(val) {
+      this.pageCount = val
+      this.onSearch()
+    },
+    onReset() {
+      this.$refs.searchForm.resetFields()
+      this.onSearch()
+    },
+    async onSearch() {
+      this.$router.push({
+        name: 'MyClientsMy',
+        query: {
+          currentPage: this.currentPage,
+          pageCount: this.pageCount,
+        },
+      })
+      this.loading = true
+      const page = this.currentPage - 1
+      const res = await client.page(this.pageCount, page, this.searchForm)
+      this.loading = false
+      this.clients = res.items
+      this.total_nums = res.total
+    },
     async loadFollowLog() {
       const clientId = this.followHistoryId
       const res = await client.listFollowLog(clientId)
@@ -155,22 +308,11 @@ export default {
     },
     async getClients(page = 0) {
       this.loading = true
-      const userRes = await client.listUsers()
-      this.users = userRes
       const pageRes = await client.page(10, page)
       this.loading = false
-      this.totalItems = pageRes.total
+      this.total_nums = pageRes.total
       const res = pageRes.items
-      this.clients = res.map(item => ({
-        ...item,
-        owned_by: this.findusernameById(item.owned_by),
-        contact_methods: JSON.parse(item.contact_methods),
-      }))
-      console.log('res is', res)
-    },
-    findusernameById(id) {
-      const match = this.users.filter(item => item.id === id)
-      return match[0].nickname
+      this.clients = res
     },
     handleFollowHistoryClose() {
       this.followHistoryId = 0
@@ -226,9 +368,32 @@ export default {
   },
   data() {
     return {
+      pageSizes: [10, 20, 30, 50],
+      total_nums: 0, // 分组内的用户总数
+      currentPage: 1, // 默认获取第一页的数据
+      pageCount: 10, // 每页10条数据
+      searchFormMeta: {
+        ownByLoading: true,
+        ownByOptions: [],
+        client_levelOptions: clientLevelOptions,
+        industryOptions: clientIndustryOptions,
+        sourceOptions: clientSourceOptions,
+        countryOptions: clientCountryOptions,
+        categoryOptions: clientCategoryOptions,
+      },
+      searchForm: {
+        owned_by: null,
+        client_name: null,
+        company_name: null,
+        code: null,
+        client_level: null,
+        industry: null,
+        source: null,
+        country: null,
+        category: null,
+      },
       users: [],
       loading: false,
-      totalItems: 0,
       showDrawerForClientId: 0,
       addingLog: false,
       clients: [],

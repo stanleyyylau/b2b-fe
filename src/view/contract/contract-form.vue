@@ -12,7 +12,7 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label="客户" prop="client_id">
-            <el-select filterable v-model="form.client_id" placeholder="Select">
+            <el-select filterable v-model="form.client_id" placeholder="Select" :loading="clientLoading">
               <el-option v-for="item in clientOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
@@ -254,7 +254,7 @@ export default {
   components: {},
   async created() {
     this.loadingForEdit = true
-    await this.getClients()
+    this.getClients()
     await this.getSpus()
     console.log('hihi')
     this.isAdmin = Boolean(this.$router.history.current.query.admin) || false
@@ -357,11 +357,13 @@ export default {
       this.form.skus[skuIndex].priceList = priceInfo
     },
     async getClients() {
+      this.clientLoading = true
       const res = await client.list()
       this.clientOptions = res.map(item => ({
         value: String(item.id),
         label: item.client_name,
       }))
+      this.clientLoading = false
       console.log('this.clientOptions', this.clientOptions)
     },
     deleteSku(index) {
@@ -553,6 +555,7 @@ export default {
       }
     }
     return {
+      clientLoading: true,
       loadingForEdit: false,
       isAdmin: false,
       submitForReview: false,
