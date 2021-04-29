@@ -68,8 +68,8 @@
         </el-form>
       </div>
       <!-- 表格 -->
-      <el-table :data="tableData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="id" width="150"> </el-table-column>
+      <el-table :data="tableData" style="width: 100%" v-loading="loading" @sort-change="onSortchange">
+        <el-table-column prop="id" label="id" width="150" sortable="custom"> </el-table-column>
         <el-table-column prop="pino" label="PI No" width="150">
           <template slot-scope="scope">
             {{ scope.row.pino ? scope.row.pino : '无 PI NO' }}
@@ -152,6 +152,18 @@ export default {
     ]
   },
   methods: {
+    onSortchange(val1, val2) {
+      console.log('val1', val1)
+      this.searchForm.sort = val1.prop
+      let order
+      if (val1.order === 'ascending') {
+        order = 'ASC'
+      } else if (val1.order === 'descending') {
+        order = 'DESC'
+      }
+      // this.searchForm.order = order
+      console.log('val2', val2, order)
+    },
     handleCurrentChange(val) {
       console.log('page change', val)
       this.currentPage = val

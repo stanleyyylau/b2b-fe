@@ -10,7 +10,7 @@
         >保存模版</el-button
       >
     </div>
-    <div class="tiny-wrapper" v-bind:class="{ horizontal: tplId == '2' || templateId == '4' }">
+    <div class="tiny-wrapper" v-bind:class="{ horizontal: tplId == '2' || tplId == '4' }">
       <editor
         api-key="5vc2o0hszxchs4ctj9cbuxgjqtuwzqg78a50tiud9jgjmxd7"
         ref="createTinymce"

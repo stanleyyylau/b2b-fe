@@ -202,6 +202,7 @@ export const tpl3 = (data, tpl) => {
       oneProduct = oneProduct.replace('{quantity}', product.quantity)
       oneProduct = oneProduct.replace('{unit-price}', formatMoney(product.price))
       oneProduct = oneProduct.replace('{t-price}', formatMoney(Number(product.quantity) * Number(product.price)))
+      oneProduct = oneProduct.replace('{products.spu_title}', skuForCurrentProduct.sku_title)
 
       productTotalCount.total += Number(product.quantity) * Number(product.price)
       return oneProduct
