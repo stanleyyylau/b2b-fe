@@ -20,7 +20,7 @@ const contractRouter = {
     {
       title: '我的合同',
       type: 'view',
-      name: 'ContractList',
+      name: 'ContractListMy',
       route: '/contract/list',
       filePath: 'view/contract/contract-list.vue',
       inNav: true,

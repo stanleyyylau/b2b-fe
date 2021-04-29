@@ -94,7 +94,7 @@ class Contract {
     })
   }
 
-  async search(params) {
+  async search(count, curPage, params) {
     const data = {}
     for (const key in params) {
       if (isObjNotEmpty(params[key])) {
@@ -103,10 +103,19 @@ class Contract {
     }
     const res = await _axios({
       method: 'post',
-      url: 'v1/ims-contract/searchlist',
+      url: `v1/ims-contract/page?count=${count}&page=${curPage}`,
       data,
     })
-    const withOwnBy = await replaceOwnedByWithName(res)
+    console.log('page res', res)
+    const filterResult = await this.postFilterContractList(res.items)
+    return {
+      ...res,
+      items: filterResult,
+    }
+  }
+
+  async postFilterContractList(list) {
+    const withOwnBy = await replaceOwnedByWithName(list)
     return this.contractFilter(withOwnBy)
   }
 }

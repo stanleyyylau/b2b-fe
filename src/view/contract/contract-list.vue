@@ -99,6 +99,21 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :background="true"
+          :page-size="pageCount"
+          :current-page="currentPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total_nums"
+          :page-sizes="pageSizes"
+          @size-change="handleSizeChange"
+        >
+        </el-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -110,8 +125,21 @@ import client from '@/model/client'
 export default {
   components: {},
   async created() {
-    this.loading = true
-    await this.getContract()
+    // todo: need user input sanitazation
+    this.pageCount = Number(this.$route.query.pageCount) || this.pageCount
+    this.currentPage = Number(this.$route.query.currentPage) || this.currentPage
+    console.log('this.pageCount', this.pageCount)
+    if (!this.pageSizes.includes(Number(this.pageCount))) {
+      this.pageSizes = [this.pageCount].concat(this.pageSizes)
+    }
+    this.$router.push({
+      name: 'ContractListMy',
+      query: {
+        currentPage: this.currentPage,
+        pageCount: this.pageCount,
+      },
+    })
+    this.onSearch()
     this.initSearchForm()
     this.operate = [
       { name: '编辑', func: 'handleEdit', type: 'primary' },
@@ -122,9 +150,31 @@ export default {
         permission: '删除图书',
       },
     ]
-    this.loading = false
   },
   methods: {
+    handleCurrentChange(val) {
+      console.log('page change', val)
+      this.currentPage = val
+      this.$router.push({
+        name: 'ContractListMy',
+        query: {
+          currentPage: this.currentPage,
+          pageCount: this.pageCount,
+        },
+      })
+      this.onSearch()
+    },
+    handleSizeChange(val) {
+      this.pageCount = val
+      this.$router.push({
+        name: 'ContractListMy',
+        query: {
+          currentPage: this.currentPage,
+          pageCount: this.pageCount,
+        },
+      })
+      this.onSearch()
+    },
     onReset() {
       this.$refs.searchForm.resetFields()
       this.onSearch()
@@ -146,9 +196,11 @@ export default {
     },
     async onSearch() {
       this.loading = true
-      const res = await contract.search(this.searchForm)
+      const page = this.currentPage - 1
+      const res = await contract.search(this.pageCount, page, this.searchForm)
       this.loading = false
-      this.tableData = res
+      this.tableData = res.items
+      this.total_nums = res.total
     },
     handleEdit(val) {
       console.log('val', val)
@@ -185,6 +237,10 @@ export default {
   },
   data() {
     return {
+      pageSizes: [10, 20, 30, 50],
+      total_nums: 0, // 分组内的用户总数
+      currentPage: 1, // 默认获取第一页的数据
+      pageCount: 10, // 每页10条数据
       tableColumn: [
         { prop: 'contract_time', label: '合同日期' },
         { prop: 'delivery_time', label: '交期' },
@@ -263,6 +319,9 @@ export default {
       showEdit: false,
       editBookID: 1,
     }
+  },
+  mounted() {
+    console.log('mountd')
   },
 }
 </script>
