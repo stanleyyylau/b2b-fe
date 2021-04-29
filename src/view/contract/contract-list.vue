@@ -70,21 +70,22 @@
       <!-- 表格 -->
       <el-table :data="tableData" style="width: 100%" v-loading="loading" @sort-change="onSortchange">
         <el-table-column prop="id" label="id" width="150" sortable="custom"> </el-table-column>
-        <el-table-column prop="pino" label="PI No" width="150">
+        <el-table-column prop="pino" label="PI No" width="150" sortable="custom">
           <template slot-scope="scope">
             {{ scope.row.pino ? scope.row.pino : '无 PI NO' }}
           </template>
         </el-table-column>
         <el-table-column prop="ownedBy" label="ownedBy" width="150"> </el-table-column>
-        <el-table-column prop="contract_time" label="contract_time" width="150"> </el-table-column>
-        <el-table-column prop="delivery_time" label="delivery_time" width="150"> </el-table-column>
-        <el-table-column prop="total_amount" label="total_amount" width="150"> </el-table-column>
-        <el-table-column prop="actual_delivery_fee" label="actual_delivery_fee" width="150"> </el-table-column>
-        <el-table-column prop="payment_method" label="payment_method" width="150"> </el-table-column>
-        <el-table-column prop="payment_status" label="payment_status" width="150"> </el-table-column>
-        <el-table-column prop="raw_cost" label="raw_cost" width="150"> </el-table-column>
-        <el-table-column prop="review_status" label="review_status" width="150"> </el-table-column>
-        <el-table-column prop="client_id" label="client_id" width="150"> </el-table-column>
+        <el-table-column prop="contract_time" label="contract_time" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="delivery_time" label="delivery_time" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="total_amount" label="total_amount" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="actual_delivery_fee" label="actual_delivery_fee" width="150" sortable="custom">
+        </el-table-column>
+        <el-table-column prop="payment_method" label="payment_method" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="payment_status" label="payment_status" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="raw_cost" label="raw_cost" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="review_status" label="review_status" width="150" sortable="custom"> </el-table-column>
+        <el-table-column prop="client_id" label="client_id" width="150" sortable="custom"> </el-table-column>
         <el-table-column fixed="right" label="Operations" width="200">
           <template slot-scope="scope">
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
@@ -152,17 +153,20 @@ export default {
     ]
   },
   methods: {
-    onSortchange(val1, val2) {
+    onSortchange(val1) {
       console.log('val1', val1)
       this.searchForm.sort = val1.prop
+      if (this.searchForm.sort === 'pino') {
+        this.searchForm.sort = 'PI_NO'
+      }
       let order
       if (val1.order === 'ascending') {
         order = 'ASC'
       } else if (val1.order === 'descending') {
         order = 'DESC'
       }
-      // this.searchForm.order = order
-      console.log('val2', val2, order)
+      this.searchForm.order = order
+      this.onSearch()
     },
     handleCurrentChange(val) {
       console.log('page change', val)
