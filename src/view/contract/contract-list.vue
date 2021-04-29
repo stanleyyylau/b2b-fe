@@ -11,6 +11,7 @@
               :loading="searchFormMeta.ownByLoading"
               v-model="searchForm.owned_by"
               clearable
+              multiple
             >
               <el-option
                 v-for="item in searchFormMeta.ownByOptions"
@@ -169,26 +170,11 @@ export default {
       this.onSearch()
     },
     handleCurrentChange(val) {
-      console.log('page change', val)
       this.currentPage = val
-      this.$router.push({
-        name: 'ContractListMy',
-        query: {
-          currentPage: this.currentPage,
-          pageCount: this.pageCount,
-        },
-      })
       this.onSearch()
     },
     handleSizeChange(val) {
       this.pageCount = val
-      this.$router.push({
-        name: 'ContractListMy',
-        query: {
-          currentPage: this.currentPage,
-          pageCount: this.pageCount,
-        },
-      })
       this.onSearch()
     },
     onReset() {
@@ -199,8 +185,22 @@ export default {
       this.searchFormMeta.ownByLoading = true
       const userOptions = await client.listUserOptions()
       this.searchFormMeta.ownByLoading = false
-      console.log(userOptions)
       this.searchFormMeta.ownByOptions = userOptions
+    },
+    async onSearch() {
+      this.$router.push({
+        name: 'ContractListMy',
+        query: {
+          currentPage: this.currentPage,
+          pageCount: this.pageCount,
+        },
+      })
+      this.loading = true
+      const page = this.currentPage - 1
+      const res = await contract.search(this.pageCount, page, this.searchForm)
+      this.loading = false
+      this.tableData = res.items
+      this.total_nums = res.total
     },
     handlePrint(id) {
       this.$router.push({
@@ -209,14 +209,6 @@ export default {
           contractId: id,
         },
       })
-    },
-    async onSearch() {
-      this.loading = true
-      const page = this.currentPage - 1
-      const res = await contract.search(this.pageCount, page, this.searchForm)
-      this.loading = false
-      this.tableData = res.items
-      this.total_nums = res.total
     },
     handleEdit(val) {
       console.log('val', val)
@@ -257,17 +249,6 @@ export default {
       total_nums: 0, // 分组内的用户总数
       currentPage: 1, // 默认获取第一页的数据
       pageCount: 10, // 每页10条数据
-      tableColumn: [
-        { prop: 'contract_time', label: '合同日期' },
-        { prop: 'delivery_time', label: '交期' },
-        { prop: 'total_amount', label: '总金额' },
-        { prop: 'actual_delivery_fee', label: '实际运费' },
-        { prop: 'payment_method', label: '付款方式' },
-        { prop: 'payment_status', label: '付款状态' },
-        { prop: 'raw_cost', label: '成本' },
-        { prop: 'review_status', label: '审核状态' },
-        { prop: 'client_id', label: '客户ID' },
-      ],
       searchFormMeta: {
         ownByLoading: true,
         ownByOptions: [],
@@ -330,14 +311,22 @@ export default {
         payment_method: null,
       },
       loading: true,
+      tableColumn: [
+        { prop: 'contract_time', label: '合同日期' },
+        { prop: 'delivery_time', label: '交期' },
+        { prop: 'total_amount', label: '总金额' },
+        { prop: 'actual_delivery_fee', label: '实际运费' },
+        { prop: 'payment_method', label: '付款方式' },
+        { prop: 'payment_status', label: '付款状态' },
+        { prop: 'raw_cost', label: '成本' },
+        { prop: 'review_status', label: '审核状态' },
+        { prop: 'client_id', label: '客户ID' },
+      ],
       tableData: [],
       operate: [],
       showEdit: false,
       editBookID: 1,
     }
-  },
-  mounted() {
-    console.log('mountd')
   },
 }
 </script>
