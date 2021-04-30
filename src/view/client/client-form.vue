@@ -2,9 +2,9 @@
   <el-row v-loading="loadingForEdit">
     <el-col :lg="20" :md="20" :sm="24" :xs="24">
       <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent :rules="formRules">
-        <el-form-item label="主要邮箱" prop="email" :disabled="editId !== 0">
+        <el-form-item label="主要邮箱" prop="email">
           <div class="email-row">
-            <el-input v-model="form.email" placeholder="请输入邮箱" :disabled="editId !== 0"></el-input>
+            <el-input v-model="form.email" placeholder="请输入邮箱"></el-input>
           </div>
         </el-form-item>
         <el-form-item label="国家" prop="country" required>
@@ -158,6 +158,7 @@ export default {
           notes: productItem.notes,
         })),
       }
+      this.form.oldEmail = this.form.email
       console.log('res is', res)
       console.log(this.form)
     },
@@ -224,7 +225,7 @@ export default {
     const validateEmail = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('error'))
-      } else if (this.editId !== 0) {
+      } else if (this.form.oldEmail === this.form.email) {
         callback()
       } else {
         client.isEmailValidForSignUp(value).then(result => {
@@ -267,6 +268,7 @@ export default {
         },
       ],
       form: {
+        oldEmail: '',
         email: '',
         category: '',
         country: '',
