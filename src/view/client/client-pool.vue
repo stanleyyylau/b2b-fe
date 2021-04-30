@@ -436,7 +436,7 @@ export default {
       }).then(async () => {
         const res = await client.acquireClient(id)
         if (res.code < window.MAX_SUCCESS_CODE) {
-          await this.getClients()
+          await this.onSearch()
           this.$message({
             type: 'success',
             message: `${res.message}`,
