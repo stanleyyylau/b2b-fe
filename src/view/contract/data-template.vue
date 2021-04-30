@@ -2,7 +2,9 @@
   <div>
     <!-- 列表页面 -->
     <div class="container">
-      <div class="header"><div class="title">我的合同</div></div>
+      <div class="header">
+        <div class="title">{{ pageTitle }}</div>
+      </div>
       <div class="search" v-if="activeSearchFields.length > 0">
         <el-form :inline="true" class="form-inline" ref="searchForm" :model="searchForm" inline-message>
           <template v-for="field in activeSearchFieldsFullData">
@@ -107,6 +109,7 @@
         @selection-change="handleSelectionChange"
         ref="dataTable"
       >
+        <!-- main columns-->
         <el-table-column type="selection" width="55"> </el-table-column>
         <template v-for="field in fields">
           <template v-if="field.isShow">
@@ -120,6 +123,8 @@
             </el-table-column>
           </template>
         </template>
+
+        <!-- 操作 custom these-->
         <el-table-column fixed="right" label="操作" width="200">
           <template slot-scope="scope">
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
@@ -128,6 +133,8 @@
             <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope)">删除</el-button>
           </template>
         </el-table-column>
+
+        <!-- end table-->
       </el-table>
 
       <!-- 分页 -->
@@ -172,7 +179,7 @@ export default {
       this.pageSizes = [this.pageCount].concat(this.pageSizes)
     }
     this.$router.push({
-      name: 'template',
+      name: this.currentRouteName,
       query: {
         currentPage: this.currentPage,
         pageCount: this.pageCount,
@@ -304,7 +311,7 @@ export default {
     },
     async onSearch() {
       this.$router.push({
-        name: 'template',
+        name: this.currentRouteName,
         query: {
           currentPage: this.currentPage,
           pageCount: this.pageCount,
@@ -356,6 +363,8 @@ export default {
   },
   data() {
     return {
+      pageTitle: '我的合同',
+      currentRouteName: 'template',
       activeSearchFieldsKey: 'template-searchFieldsActive',
       displayFieldsKey: 'template-displayFields',
       pageSizes: [10, 20, 30, 50],
