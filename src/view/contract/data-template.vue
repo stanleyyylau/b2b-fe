@@ -187,11 +187,11 @@ export default {
       this.activeSearchFields = this.activeSearchFields.filter(item => item !== fieldName)
     },
     asyncLocalDb() {
-      const activeSearchFields = localStore.get('template-searchFieldsActive')
+      const activeSearchFields = localStore.get(this.activeSearchFieldsKey)
       if (activeSearchFields && activeSearchFields instanceof Array) {
         this.activeSearchFields = activeSearchFields
       }
-      const displayFields = localStore.get('template-displayFields')
+      const displayFields = localStore.get(this.displayFieldsKey)
       if (displayFields && displayFields instanceof Array) {
         this.fields.forEach(field => {
           if (displayFields.includes(field.name)) {
@@ -218,7 +218,7 @@ export default {
     },
     onDisplayFieldsSave() {
       const displayFieldsName = this.fields.filter(item => item.isShow).map(item => item.name)
-      localStore.put('template-displayFields', displayFieldsName)
+      localStore.put(this.displayFieldsKey, displayFieldsName)
       this.$message('保存成功')
     },
     handleCurrentChange(val) {
@@ -236,7 +236,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
-        localStore.delete('template-searchFieldsActive')
+        localStore.delete(this.activeSearchFieldsKey)
         this.$message('删除成功')
       })
     },
@@ -260,7 +260,7 @@ export default {
     },
     onSearchFieldSave() {
       const activeSearchFieldNames = [...this.activeSearchFields]
-      localStore.put('template-searchFieldsActive', activeSearchFieldNames)
+      localStore.put(this.activeSearchFieldsKey, activeSearchFieldNames)
       this.activeSearchFields = activeSearchFieldNames
       this.$message('保存成功')
     },
@@ -356,6 +356,8 @@ export default {
   },
   data() {
     return {
+      activeSearchFieldsKey: 'template-searchFieldsActive',
+      displayFieldsKey: 'template-displayFields',
       pageSizes: [10, 20, 30, 50],
       total_nums: 0, // 分组内的用户总数
       currentPage: 1, // 默认获取第一页的数据
@@ -528,15 +530,15 @@ export default {
         },
       ],
       loading: true, // main table loading status
-      tableData: [],
-      selectionList: [],
+      tableData: [], // needless to say
+      selectionList: [], // selected rows
       exportAllVisible: false,
     }
   },
   computed: {
     showSaveSearchButton() {
       const currentActiveSearch = [...this.activeSearchFields]
-      const oldActiveSearch = localStore.get('template-searchFieldsActive')
+      const oldActiveSearch = localStore.get(this.activeSearchFieldsKey)
       return JSON.stringify(currentActiveSearch) !== JSON.stringify(oldActiveSearch)
     },
     activeSearchFieldsFullData() {
@@ -546,4 +548,66 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  padding: 0 30px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      height: 59px;
+      line-height: 59px;
+      color: $parent-title-color;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px;
+  }
+
+  .export-row {
+    padding: 12px 24px;
+    background-color: rgb(230, 244, 255);
+    border: 1px solid rgb(122, 186, 255);
+    margin-bottom: 15px;
+  }
+
+  .delete-icon-wrap {
+    display: inline-block;
+    cursor: pointer;
+    margin: 0 7px;
+  }
+
+  .flex-middle {
+    display: flex;
+    align-items: center;
+  }
+
+  .main-operation-row {
+    text-align: right;
+    padding-bottom: 20px;
+    padding-top: 20px;
+  }
+
+  .selection-button-wrap {
+    text-align: right;
+  }
+
+  .addSearchButton {
+    margin-right: 10px;
+  }
+
+  .refresh-button {
+    border: 0;
+    background-color: transparent;
+    margin-left: 0 !important;
+  }
+}
+</style>
