@@ -119,6 +119,7 @@
                   <template slot-scope="scope">
                     <el-form-item required :prop="`skus[${scope.$index}].spu_sku`">
                       <el-cascader
+                        filterable
                         v-model="scope.row.spu_sku"
                         :options="spuOptions"
                         @change="handleSkuSelect(scope.$index)"
