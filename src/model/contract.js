@@ -123,7 +123,7 @@ class Contract {
     return _axios({
       method: 'get',
       url: 'v1/ims-contract/export',
-      responseType: 'blob',
+      // responseType: 'blob',
     })
   }
 }

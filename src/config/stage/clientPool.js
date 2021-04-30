@@ -1,6 +1,6 @@
 const clientPoolRouter = {
   route: '/client-pool',
-  name: null,
+  name: 'publicSea',
   title: '公海客户',
   type: 'view', // 类型: folder, tab, view
   icon: 'iconfont icon-tushuguanli',

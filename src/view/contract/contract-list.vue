@@ -281,8 +281,12 @@ export default {
       this.exportAllVisible = false
       this.loading = true
       console.log('export all data confirm')
-      const res = await contract.exportAll()
-      this.download(res, `${new Date().getTime()}.csv`)
+      try {
+        const res = await contract.exportAll()
+        this.download(res, `${new Date().getTime()}.csv`)
+      } catch (e) {
+        console.log('e', e)
+      }
       this.loading = false
     },
     download(data, filename = 'data.csv') {

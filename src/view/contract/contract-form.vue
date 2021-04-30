@@ -22,68 +22,40 @@
           </el-form-item>
           <el-row>
             <el-col :span="8">
-              <el-form-item label="总金额" prop="total_amount">
-                <el-input v-model="form.total_amount">
-                  <template slot="append"
-                    >USD</template
-                  >
-                </el-input>
+              <el-form-item label="总金额(USD)" prop="total_amount">
+                <el-input v-model="form.total_amount"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="客付运费" prop="shipping_cost">
-                <el-input v-model="form.shipping_cost">
-                  <template slot="append"
-                    >USD</template
-                  >
-                </el-input>
+              <el-form-item label="客付运费(USD)" prop="shipping_cost">
+                <el-input v-model="form.shipping_cost"> </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item prop="additional_cost" label="额外费用">
-                <el-input v-model="form.additional_cost">
-                  <template slot="append"
-                    >USD</template
-                  >
-                </el-input>
+              <el-form-item prop="additional_cost" label="额外费用(USD)">
+                <el-input v-model="form.additional_cost"> </el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="6">
-              <el-form-item prop="transaction_fee" label="手续费">
-                <el-input v-model="form.transaction_fee">
-                  <template slot="append"
-                    >USD</template
-                  >
-                </el-input>
+              <el-form-item prop="transaction_fee" label="手续费(USD)">
+                <el-input v-model="form.transaction_fee"> </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item prop="insurance_cost" label="保险费">
-                <el-input v-model="form.insurance_cost">
-                  <template slot="append"
-                    >USD</template
-                  >
-                </el-input>
+              <el-form-item prop="insurance_cost" label="保险费(USD)">
+                <el-input v-model="form.insurance_cost"> </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item prop="actual_delivery_fee" label="支出运费">
-                <el-input v-model="form.actual_delivery_fee">
-                  <template slot="append"
-                    >RMB</template
-                  >
-                </el-input>
+              <el-form-item prop="actual_delivery_fee" label="支出运费(RMB)">
+                <el-input v-model="form.actual_delivery_fee"> </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item prop="other_fee" label="其他费用">
-                <el-input v-model="form.other_fee" placeholder="除运费外的支出">
-                  <template slot="append"
-                    >RMB</template
-                  >
-                </el-input>
+              <el-form-item prop="other_fee" label="其他费用(RMB)">
+                <el-input v-model="form.other_fee" placeholder="除运费外的支出"> </el-input>
               </el-form-item>
             </el-col>
           </el-row>

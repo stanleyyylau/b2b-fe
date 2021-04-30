@@ -35,12 +35,15 @@ class Client {
     }))
   }
 
-  async page(count, curPage, params) {
+  async page(count, curPage, params, listSeaClient = false) {
     const data = {}
     for (const key in params) {
       if (isObjNotEmpty(params[key])) {
         data[key] = params[key]
       }
+    }
+    if (listSeaClient) {
+      data.owned_by = [0]
     }
     const res = await _axios({
       method: 'post',
@@ -117,6 +120,14 @@ class Client {
     return _axios({
       method: 'get',
       url: `v1/cms-client-follow-log/listByClientId/${id}`,
+    })
+  }
+
+  async exportAll() {
+    return _axios({
+      method: 'get',
+      url: 'v1/cms-client-info/export',
+      // responseType: 'blob',
     })
   }
 }
