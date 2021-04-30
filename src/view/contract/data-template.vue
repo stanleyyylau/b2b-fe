@@ -3,119 +3,88 @@
     <!-- 列表页面 -->
     <div class="container">
       <div class="header"><div class="title">我的合同</div></div>
-      <div class="search">
-        <el-form :inline="true" class="form-inline" ref="searchForm" :model="searchForm">
-          <el-form-item
-            v-for="(field, index) in searchFields"
-            :key="field.name"
-            :label="field.displayName + ' :'"
-            :prop="field.name"
-          >
-            <div class="flex-middle">
-              <div>
-                <el-select
-                  :loading="field.loading"
-                  v-model="searchForm[field.name]"
-                  clearable
-                  multiple
-                  v-if="field.type === 'Connect'"
-                >
-                  <el-option v-for="item in field.options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select>
-                <el-input v-model="searchForm[field.name]" v-if="field.type === 'String'"></el-input>
-                <el-select v-model="searchForm[field.name]" clearable multiple v-if="field.type === 'Enum'">
-                  <el-option v-for="item in field.options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select>
+      <div class="search" v-if="activeSearchFields.length > 0">
+        <el-form :inline="true" class="form-inline" ref="searchForm" :model="searchForm" inline-message>
+          <template v-for="field in activeSearchFieldsFullData">
+            <el-form-item :key="field.name" :label="field.displayName + ' :'" :prop="field.name">
+              <div class="flex-middle">
+                <div>
+                  <el-select
+                    :loading="field.loading"
+                    v-model="searchForm[field.name]"
+                    clearable
+                    multiple
+                    v-if="field.type === 'Connect'"
+                  >
+                    <el-option v-for="item in field.options" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                  <el-input v-model="searchForm[field.name]" v-if="field.type === 'String'"></el-input>
+                  <el-select v-model="searchForm[field.name]" clearable multiple v-if="field.type === 'Enum'">
+                    <el-option v-for="item in field.options" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+                <div>
+                  <span class="delete-icon-wrap" @click="onSearchFieldRemove(field.name)"
+                    ><i class="el-icon-delete"></i
+                  ></span>
+                </div>
               </div>
-              <div>
-                <span class="delete-icon-wrap" @click="handleDeleteField(index)"><i class="el-icon-delete"></i></span>
-              </div>
-            </div>
-          </el-form-item>
-          <!--          <el-form-item label="owned_by :" prop="owned_by">-->
-          <!--            <div class="flex-middle">-->
-          <!--              <div>-->
-          <!--                <el-select-->
-          <!--                  placeholder="owned_by"-->
-          <!--                  :loading="searchFormMeta.ownByLoading"-->
-          <!--                  v-model="searchForm.owned_by"-->
-          <!--                  clearable-->
-          <!--                  multiple-->
-          <!--                >-->
-          <!--                  <el-option-->
-          <!--                    v-for="item in searchFormMeta.ownByOptions"-->
-          <!--                    :key="item.value"-->
-          <!--                    :label="item.label"-->
-          <!--                    :value="item.value"-->
-          <!--                  >-->
-          <!--                  </el-option>-->
-          <!--                </el-select>-->
-          <!--              </div>-->
-          <!--              <div>-->
-          <!--                <span class="delete-icon-wrap"><i class="el-icon-delete"></i></span>-->
-          <!--              </div>-->
-          <!--            </div>-->
-          <!--          </el-form-item>-->
-          <!--          <el-form-item label="PI_NO :" prop="PI_NO">-->
-          <!--            <div class="flex-middle">-->
-          <!--              <div>-->
-          <!--                <el-input placeholder="PI_NO" v-model="searchForm.PI_NO"></el-input>-->
-          <!--              </div>-->
-          <!--              <div>-->
-          <!--                <span class="delete-icon-wrap"><i class="el-icon-delete"></i></span>-->
-          <!--              </div>-->
-          <!--            </div>-->
-          <!--          </el-form-item>-->
-          <!--          <el-form-item label="payment_status :" prop="payment_status">-->
-          <!--            <el-select placeholder="payment_status" v-model="searchForm.payment_status" clearable multiple>-->
-          <!--              <el-option-->
-          <!--                v-for="item in searchFormMeta.payment_statusOptions"-->
-          <!--                :key="item.value"-->
-          <!--                :label="item.label"-->
-          <!--                :value="item.value"-->
-          <!--              >-->
-          <!--              </el-option>-->
-          <!--            </el-select>-->
-          <!--          </el-form-item>-->
-          <!--          <el-form-item label="review_status :" prop="review_status">-->
-          <!--            <el-select placeholder="review_status" v-model="searchForm.review_status" clearable multiple>-->
-          <!--              <el-option-->
-          <!--                v-for="item in searchFormMeta.review_statusOptions"-->
-          <!--                :key="item.value"-->
-          <!--                :label="item.label"-->
-          <!--                :value="item.value"-->
-          <!--              >-->
-          <!--              </el-option>-->
-          <!--            </el-select>-->
-          <!--          </el-form-item>-->
-          <!--          <el-form-item label="payment_method :" prop="payment_method">-->
-          <!--            <el-select placeholder="payment_method" v-model="searchForm.payment_method" clearable multiple>-->
-          <!--              <el-option-->
-          <!--                v-for="item in searchFormMeta.payment_methodOptions"-->
-          <!--                :key="item.value"-->
-          <!--                :label="item.label"-->
-          <!--                :value="item.value"-->
-          <!--              >-->
-          <!--              </el-option>-->
-          <!--            </el-select>-->
-          <!--          </el-form-item>-->
+            </el-form-item>
+          </template>
           <el-form-item>
+            <el-tooltip class="item" effect="dark" content="删除所有检索条件" placement="top">
+              <el-button type="plain" @click="onEmptySearchFields">删除</el-button>
+            </el-tooltip>
             <el-tooltip class="item" effect="dark" content="按条件进行 AND 查询" placement="top">
               <el-button type="primary" @click="onSearch" :disabled="loading">查询</el-button>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="清空搜索输入值并重新查询" placement="top">
               <el-button type="primary" @click="onReset" :disabled="loading">重置</el-button>
             </el-tooltip>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="保存检索条件到浏览器，下次无需再一个个添加检索"
+              placement="top"
+            >
+              <el-button type="primary" @click="onSearchFieldSave" v-if="showSaveSearchButton">保存</el-button>
+            </el-tooltip>
           </el-form-item>
         </el-form>
       </div>
       <div class="main-operation-row">
-        <el-button>导入数据</el-button>
-        <el-button>导出数据</el-button>
-        <el-button>刷新</el-button>
-        <el-button>列设置</el-button>
+        <el-dropdown :hide-on-click="false" trigger="click" class="addSearchButton">
+          <el-button type="primary" icon="el-icon-aim">
+            添加检索
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="field in searchFields" :key="field.name">
+              <el-button type="text" @click="onAddSearchField(field.name)">{{ field.displayName }}</el-button>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-button type="primary">导入数据</el-button>
+        <el-button type="primary" @click="exportAllVisible = true">导出数据</el-button>
+        <el-button
+          @click="onSearch"
+          :disabled="loading"
+          icon="el-icon-refresh"
+          round
+          class="refresh-button"
+        ></el-button>
+        <el-dropdown :hide-on-click="false" trigger="click">
+          <el-button icon="el-icon-s-tools" round class="refresh-button"></el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <el-button type="text" @click="onDisplayFieldsSave">保存</el-button>
+            </el-dropdown-item>
+            <el-dropdown-item v-for="field in fields" :key="field.name">
+              <el-checkbox v-model="field.isShow">{{ field.displayName }}</el-checkbox>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
       <div class="export-row" v-if="selectionList.length > 0">
         <el-row type="flex" justify="space-between" align="middle">
@@ -139,14 +108,8 @@
         ref="dataTable"
       >
         <el-table-column type="selection" width="55"> </el-table-column>
-        <!--        <el-table-column prop="id" label="id" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="pino" label="PI No" width="150" sortable="custom">-->
-        <!--          <template slot-scope="scope">-->
-        <!--            {{ scope.row.pino ? scope.row.pino : '无 PI NO' }}-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
         <template v-for="field in fields">
-          <template v-if="!field.isHidden">
+          <template v-if="field.isShow">
             <el-table-column
               :key="field.name"
               :prop="field.name"
@@ -157,18 +120,6 @@
             </el-table-column>
           </template>
         </template>
-        <!--        <el-table-column v-for="field in fields" :key="field.name" :prop="field.name" :label="field.displayName" width="150" :sortable="field.sortable ? 'custom' : false"> </el-table-column>-->
-        <!--        <el-table-column prop="ownedBy" label="ownedBy" width="150"> </el-table-column>-->
-        <!--        <el-table-column prop="contract_time" label="contract_time" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="delivery_time" label="delivery_time" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="total_amount" label="total_amount" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="actual_delivery_fee" label="actual_delivery_fee" width="150" sortable="custom">-->
-        <!--        </el-table-column>-->
-        <!--        <el-table-column prop="payment_method" label="payment_method" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="payment_status" label="payment_status" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="raw_cost" label="raw_cost" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="review_status" label="review_status" width="150" sortable="custom"> </el-table-column>-->
-        <!--        <el-table-column prop="client_id" label="client_id" width="150" sortable="custom"> </el-table-column>-->
         <el-table-column fixed="right" label="操作" width="200">
           <template slot-scope="scope">
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
@@ -194,10 +145,20 @@
         </el-pagination>
       </div>
     </div>
+
+    <!-- export all-->
+    <el-dialog title="导出数据" :visible.sync="exportAllVisible" width="30%">
+      <span>将全量导出数据，会花费一段时间，是否继续</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="exportAllVisible = false">取 消</el-button>
+        <el-button type="primary" @click="onExportAllConfirm">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import localStore from '@/model/local'
 import contract from '@/model/contract'
 import client from '@/model/client'
 
@@ -219,8 +180,28 @@ export default {
     })
     this.onSearch()
     this.initSearchForm()
+    this.asyncLocalDb()
   },
   methods: {
+    onSearchFieldRemove(fieldName) {
+      this.activeSearchFields = this.activeSearchFields.filter(item => item !== fieldName)
+    },
+    asyncLocalDb() {
+      const activeSearchFields = localStore.get('template-searchFieldsActive')
+      if (activeSearchFields && activeSearchFields instanceof Array) {
+        this.activeSearchFields = activeSearchFields
+      }
+      const displayFields = localStore.get('template-displayFields')
+      if (displayFields && displayFields instanceof Array) {
+        this.fields.forEach(field => {
+          if (displayFields.includes(field.name)) {
+            field.isShow = true
+          } else {
+            field.isShow = false
+          }
+        })
+      }
+    },
     onSortchange(val1) {
       this.searchForm.sort = val1.prop
       if (this.searchForm.sort === 'pino') {
@@ -235,6 +216,11 @@ export default {
       this.searchForm.order = order
       this.onSearch()
     },
+    onDisplayFieldsSave() {
+      const displayFieldsName = this.fields.filter(item => item.isShow).map(item => item.name)
+      localStore.put('template-displayFields', displayFieldsName)
+      this.$message('保存成功')
+    },
     handleCurrentChange(val) {
       this.currentPage = val
       this.onSearch()
@@ -243,12 +229,64 @@ export default {
       this.pageCount = val
       this.onSearch()
     },
+    onEmptySearchFields() {
+      this.activeSearchFields = []
+      this.$confirm('是否删除保存的检索条件?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        localStore.delete('template-searchFieldsActive')
+        this.$message('删除成功')
+      })
+    },
     onReset() {
       this.$refs.searchForm.resetFields()
       // this.searchFields.forEach((item, index) => {
       //   this.searchFields[index].vmodel = null
       // })
       this.onSearch()
+    },
+    onAddSearchField(fieldName) {
+      // const isExist = this.searchFields.filter(item => item.name === field.name)
+      // if (isExist.length > 0) {
+      //   return this.$message.warning('请勿重复添加')
+      // }
+      // this.searchFields = [...this.searchFields, field]
+      if (this.activeSearchFields.includes(fieldName)) {
+        return this.$message.warning('请勿重复添加')
+      }
+      this.activeSearchFields.push(fieldName)
+    },
+    onSearchFieldSave() {
+      const activeSearchFieldNames = [...this.activeSearchFields]
+      localStore.put('template-searchFieldsActive', activeSearchFieldNames)
+      this.activeSearchFields = activeSearchFieldNames
+      this.$message('保存成功')
+    },
+    async onExportAllConfirm() {
+      this.exportAllVisible = false
+      this.loading = true
+      console.log('export all data confirm')
+      const res = await contract.exportAll()
+      this.download(res, `${new Date().getTime()}.csv`)
+      this.loading = false
+    },
+    download(data, filename = 'data.csv') {
+      if (!data) {
+        return
+      }
+      const blob = data
+      const reader = new FileReader()
+      reader.readAsDataURL(blob) // base64
+      reader.onload = function (e) {
+        const a = document.createElement('a')
+        a.download = filename
+        a.href = e.target.result
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
     },
     async initSearchForm() {
       let targetIndex
@@ -323,6 +361,7 @@ export default {
       currentPage: 1, // 默认获取第一页的数据
       pageCount: 10, // 每页10条数据
       searchForm: {}, // this form is computed by search fields
+      activeSearchFields: [], // computed
       searchFields: [
         {
           displayName: '业务员',
@@ -407,127 +446,104 @@ export default {
           name: 'id',
           displayName: 'id',
           isHidden: true,
+          isShow: false,
           sortable: true,
         },
         {
           name: 'pino',
           displayName: 'PI编号',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'ownedBy',
           displayName: '业务员',
           isHidden: false,
+          isShow: true,
           sortable: false,
         },
         {
           name: 'contract_time',
           displayName: '合同时间',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'delivery_time',
           displayName: '收货时间',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'total_amount',
           displayName: '总金额',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'actual_delivery_fee',
           displayName: '实际运费',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'payment_method',
           displayName: '付款方式',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'payment_status',
           displayName: '支付状态',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'raw_cost',
           displayName: '成本价',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'review_status',
           displayName: '审核状态',
           isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
           name: 'client_id',
           displayName: '客户ID',
           isHidden: true,
+          isShow: false,
           sortable: true,
         },
       ],
       loading: true, // main table loading status
       tableData: [],
       selectionList: [],
+      exportAllVisible: false,
     }
+  },
+  computed: {
+    showSaveSearchButton() {
+      const currentActiveSearch = [...this.activeSearchFields]
+      const oldActiveSearch = localStore.get('template-searchFieldsActive')
+      return JSON.stringify(currentActiveSearch) !== JSON.stringify(oldActiveSearch)
+    },
+    activeSearchFieldsFullData() {
+      return this.activeSearchFields.map(fieldName => this.searchFields.filter(field => field.name === fieldName)[0])
+    },
   },
 }
 </script>
 
-<style lang="scss" scoped>
-.container {
-  padding: 0 30px;
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .title {
-      height: 59px;
-      line-height: 59px;
-      color: $parent-title-color;
-      font-size: 16px;
-      font-weight: 500;
-    }
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: flex-end;
-    margin: 20px;
-  }
-}
-
-.selection-button-wrap {
-  text-align: right;
-}
-
-.export-row {
-  padding: 12px 24px;
-  background-color: rgb(230, 244, 255);
-  border: 1px solid rgb(122, 186, 255);
-  margin-bottom: 15px;
-}
-
-.delete-icon-wrap {
-  display: inline-block;
-  cursor: pointer;
-  margin: 0 7px;
-}
-
-.flex-middle {
-  display: flex;
-  align-items: center;
-}
-</style>
+<style lang="scss" scoped></style>

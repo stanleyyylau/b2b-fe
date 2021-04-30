@@ -118,6 +118,14 @@ class Contract {
     const withOwnBy = await replaceOwnedByWithName(list)
     return this.contractFilter(withOwnBy)
   }
+
+  async exportAll() {
+    return _axios({
+      method: 'get',
+      url: 'v1/ims-contract/export',
+      responseType: 'blob',
+    })
+  }
 }
 
 export default new Contract()

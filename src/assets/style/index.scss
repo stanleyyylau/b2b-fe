@@ -21,3 +21,77 @@
     padding: 20px;
   }
 }
+
+.search {
+  .el-form-item__content {
+    margin-bottom: 0!important;
+  }
+  .el-form-item {
+    margin-bottom: 10px!important;
+  }
+}
+
+//should be global for data template page
+.container {
+  padding: 0 30px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      height: 59px;
+      line-height: 59px;
+      color: $parent-title-color;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px;
+  }
+
+  .export-row {
+    padding: 12px 24px;
+    background-color: rgb(230, 244, 255);
+    border: 1px solid rgb(122, 186, 255);
+    margin-bottom: 15px;
+  }
+
+  .delete-icon-wrap {
+    display: inline-block;
+    cursor: pointer;
+    margin: 0 7px;
+  }
+
+  .flex-middle {
+    display: flex;
+    align-items: center;
+  }
+
+  .main-operation-row {
+    text-align: right;
+    padding-bottom: 20px;
+    padding-top: 20px;
+  }
+
+  .selection-button-wrap {
+    text-align: right;
+  }
+
+  .addSearchButton {
+    margin-right: 10px;
+  }
+
+  .refresh-button {
+    border: 0;
+    background-color: transparent;
+    margin-left: 0!important;
+  }
+}
+
+

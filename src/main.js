@@ -2,6 +2,10 @@ import '@babel/polyfill'
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 
+import '@/assets/style/index.scss' // eslint-disable-line
+import '@/assets/style/realize/element-variable.scss'
+import 'element-ui/lib/theme-chalk/display.css'
+
 import '@/config/global'
 import '@/lin/mixin'
 import '@/lin/filter'
@@ -17,10 +21,6 @@ import App from '@/app.vue'
 import StickyTop from '@/component/base/sticky-top/sticky-top'
 import LIcon from '@/component/base/icon/lin-icon'
 import SourceCode from '@/component/base/source-code/source-code'
-
-import '@/assets/style/index.scss' // eslint-disable-line
-import '@/assets/style/realize/element-variable.scss'
-import 'element-ui/lib/theme-chalk/display.css'
 
 Vue.config.productionTip = false
 
