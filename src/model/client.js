@@ -127,7 +127,7 @@ class Client {
     return _axios({
       method: 'get',
       url: 'v1/cms-client-info/export',
-      // responseType: 'blob',
+      responseType: 'blob',
     })
   }
 }

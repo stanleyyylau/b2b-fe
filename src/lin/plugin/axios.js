@@ -167,7 +167,7 @@ _axios.interceptors.response.use(
       }
       console.log('err')
       Vue.prototype.$message({
-        message,
+        message: message || '无权限',
         type: 'error',
       })
       reject()
