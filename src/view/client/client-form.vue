@@ -1,7 +1,12 @@
 <template>
   <el-row v-loading="loadingForEdit">
     <el-col :lg="20" :md="20" :sm="24" :xs="24">
-      <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent>
+      <el-form :model="form" status-icon ref="form" label-width="150px" @submit.native.prevent :rules="formRules">
+        <el-form-item label="主要邮箱" prop="email">
+          <div class="email-row">
+            <el-input v-model="form.email" placeholder="请输入邮箱"></el-input>
+          </div>
+        </el-form-item>
         <el-form-item label="国家" prop="country" required>
           <el-select filterable v-model="form.country" placeholder="Select" @change="generateClientCode">
             <el-option v-for="item in countryList" :key="item.value" :label="item.label" :value="item.value">
@@ -216,7 +221,37 @@ export default {
     },
   },
   data() {
+    const validateEmail = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('error'))
+      } else {
+        client.isEmailValidForSignUp(value).then(result => {
+          if (result) {
+            callback()
+          } else {
+            callback(new Error('已存在'))
+          }
+        })
+      }
+    }
     return {
+      formRules: {
+        email: [
+          {
+            required: true,
+            message: '请输入正确的邮箱',
+            trigger: 'blur',
+            type: 'string',
+            // eslint-disable-next-line no-control-regex
+            pattern: /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/,
+          },
+          {
+            validator: validateEmail,
+            message: '邮箱已存在，归属公海或其他业务，请更换邮箱或联系管理员',
+            trigger: 'blur',
+          },
+        ],
+      },
       categoryOptions: clientCategoryOptions,
       loadingForEdit: false,
       countryList: clientCountryOptions,
@@ -230,6 +265,7 @@ export default {
         },
       ],
       form: {
+        email: '',
         category: '',
         country: '',
         address: '',
@@ -301,6 +337,10 @@ export default {
     display: flex;
     justify-content: flex-end;
     margin: 20px;
+  }
+
+  .email-row {
+    max-width: 280px;
   }
 }
 </style>

@@ -130,6 +130,14 @@ class Client {
       responseType: 'blob',
     })
   }
+
+  async isEmailValidForSignUp(email) {
+    const res = await _axios({
+      method: 'get',
+      url: `v1/cms-client-info/checkValid/${email}`,
+    })
+    return res.isValid
+  }
 }
 
 export default new Client()

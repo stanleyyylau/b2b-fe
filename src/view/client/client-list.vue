@@ -551,6 +551,11 @@ export default {
       activeSearchFields: [], // computed
       searchFields: [
         {
+          displayName: '主邮箱',
+          name: 'email',
+          type: 'String',
+        },
+        {
           displayName: '业务员',
           name: 'owned_by',
           type: 'Connect',
@@ -609,6 +614,13 @@ export default {
           displayName: 'id',
           isHidden: true,
           isShow: false,
+          sortable: true,
+        },
+        {
+          name: 'email',
+          displayName: '主邮箱',
+          isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {

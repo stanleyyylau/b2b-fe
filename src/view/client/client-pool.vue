@@ -486,6 +486,11 @@ export default {
       activeSearchFields: [], // computed
       searchFields: [
         {
+          displayName: '主邮箱',
+          name: 'email',
+          type: 'String',
+        },
+        {
           displayName: '客户名称',
           name: 'client_name',
           type: 'String',
@@ -537,6 +542,13 @@ export default {
           displayName: 'id',
           isHidden: true,
           isShow: false,
+          sortable: true,
+        },
+        {
+          name: 'email',
+          displayName: '主邮箱',
+          isHidden: false,
+          isShow: true,
           sortable: true,
         },
         {
