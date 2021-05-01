@@ -133,13 +133,7 @@
               <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
                 编辑客户
               </el-button>
-              <el-button
-                v-permission="['新增产品']"
-                plain
-                type="primary"
-                size="mini"
-                @click.native.prevent.stop="handleDrawer(scope.row.id)"
-              >
+              <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
                 文件
               </el-button>
             </div>

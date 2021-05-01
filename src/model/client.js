@@ -117,10 +117,15 @@ class Client {
   }
 
   async listFollowLog(id) {
-    return _axios({
+    const res = await _axios({
       method: 'get',
       url: `v1/cms-client-follow-log/listByClientId/${id}`,
     })
+    const withName = await replaceOwnedByWithName(res)
+    return withName.map(item => ({
+      ...item,
+      follow_time: new Date(item.follow_time).toLocaleString(),
+    }))
   }
 
   async exportAll() {

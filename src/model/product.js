@@ -92,6 +92,23 @@ class Product {
     })
   }
 
+  async deleteClientFileById(id) {
+    return _axios({
+      method: 'delete',
+      url: `v1/cms-client-files/${id}`,
+    })
+  }
+
+  async updateClientFileName(id, newName) {
+    return _axios({
+      method: 'put',
+      url: `v1/cms-client-files/${id}`,
+      data: {
+        fileName: newName,
+      },
+    })
+  }
+
   async getProductDetailsForPrint(idsList) {
     return _axios({
       method: 'get',

@@ -23,6 +23,9 @@ export const replaceOwnedByWithName = async list => {
     ownedBy: users.filter(user => user.id === item.owned_by)[0]
       ? users.filter(user => user.id === item.owned_by)[0].nickname
       : '',
+    user_id: users.filter(user => user.id === item.user_id)[0]
+      ? users.filter(user => user.id === item.user_id)[0].nickname
+      : '',
   }))
 }
 window.accounting = accounting
@@ -180,12 +183,16 @@ export const clientSourceOptions = [
     label: '阿里',
   },
   {
-    value: '开发信',
-    label: '开发信',
+    value: '网页+SNS',
+    label: '网页+SNS',
   },
   {
     value: '官网',
     label: '官网',
+  },
+  {
+    value: 'C端平台',
+    label: 'C端平台',
   },
 ]
 
@@ -195,10 +202,6 @@ export const clientCategoryOptions = [
   {
     value: '口罩（防疫物资）',
     label: '口罩（防疫物资）',
-  },
-  {
-    value: '搜索引擎',
-    label: '搜索引擎',
   },
   {
     value: '金属卡包',

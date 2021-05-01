@@ -132,19 +132,12 @@
               <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope.row.id)">
                 编辑客户
               </el-button>
-              <el-button
-                v-permission="['新增产品']"
-                plain
-                type="primary"
-                size="mini"
-                @click.native.prevent.stop="handleDrawer(scope.row.id)"
-              >
+              <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
                 查看文件
               </el-button>
             </div>
             <div class="operation-row">
               <el-button
-                v-permission="['新增产品']"
                 plain
                 type="primary"
                 size="mini"
@@ -181,41 +174,7 @@
       </div>
     </div>
 
-    <el-drawer
-      title="跟进历史"
-      :visible.sync="showFollowHistory"
-      direction="rtl"
-      :before-close="handleFollowHistoryClose"
-    >
-      <div>
-        <el-form :model="followForm" ref="followForm" label-width="120px" class="followForm">
-          <el-form-item label="跟进时间" prop="followTime">
-            <el-date-picker v-model="followForm.follow_time" type="datetime" placeholder="Select date and time">
-            </el-date-picker>
-          </el-form-item>
-          <el-form-item label="跟进内容" prop="content">
-            <el-input type="textarea" v-model="followForm.content"></el-input>
-          </el-form-item>
-          <el-form-item label="星标" prop="star">
-            <el-rate v-model="followForm.star"></el-rate>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" :loading="addingLog" @click="handleFollowSubmit">新增跟进记录</el-button>
-          </el-form-item>
-          <div class="followCards">
-            <el-card v-bind:key="index" class="box-card" v-for="(item, index) in followHistory">
-              <div>
-                <div>{{ item.create_time }} - {{ item.followBy }}</div>
-                <div><el-rate disabled="true" :value="item.star"></el-rate></div>
-              </div>
-              <div>
-                {{ item.content }}
-              </div>
-            </el-card>
-          </div>
-        </el-form>
-      </div>
-    </el-drawer>
+    <follow-log :followHistoryId="followHistoryId" @onClose="followHistoryId = 0"></follow-log>
 
     <file-attachment
       title="客户关联的文件"
@@ -223,6 +182,8 @@
       @close="handleClose"
       :fileList="fileList"
       @uploaded="handleUploaded"
+      @onFileDelete="deleteClientFileById"
+      @onFileNameUpdate="updateClientFileName"
     />
 
     <!-- export all-->
@@ -240,6 +201,7 @@
 import client from '@/model/client'
 import product from '@/model/product'
 import fileAttachment from '@/component/common/file-attachment'
+import followLog from './follow-log'
 import { clientCategoryOptions,
   clientCountryOptions,
   clientIndustryOptions,
@@ -250,6 +212,7 @@ import localStore from '@/model/local'
 export default {
   components: {
     fileAttachment,
+    followLog,
   },
   created() {
     // todo: need user input sanitazation
@@ -459,6 +422,7 @@ export default {
     }, // below are custom
     async loadFollowLog() {
       const clientId = this.followHistoryId
+      this.followForm.follow_time = new Date()
       const res = await client.listFollowLog(clientId)
       this.followHistory = res.map(item => ({
         create_time: item.follow_time,
@@ -468,6 +432,8 @@ export default {
       }))
     },
     async handleFollowSubmit() {
+      const isValid = await this.$refs.followForm.validate()
+      if (!isValid) return
       this.addingLog = true
       const data = { ...this.followForm, client_id: this.followHistoryId }
       console.log('form daata,', data)
@@ -475,6 +441,7 @@ export default {
       this.addingLog = false
       this.followForm.content = ''
       this.followForm.star = 0
+      this.followForm.follow_time = new Date()
       await this.loadFollowLog()
     },
     async getClients(page = 0) {
@@ -516,6 +483,25 @@ export default {
       this.showDrawerForClientId = id
       this.getFileList()
     },
+    async deleteClientFileById(fileId) {
+      console.log('delete', fileId)
+      try {
+        await product.deleteClientFileById(fileId)
+        this.$message('删除成功')
+        this.getFileList()
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async updateClientFileName(fileId, newName) {
+      try {
+        await product.updateClientFileName(fileId, newName)
+        this.$message('更新成功')
+        this.getFileList()
+      } catch (e) {
+        console.log(e)
+      }
+    },
     async handleUploaded(res) {
       console.log('uploaded result is', res)
       await product.createFileForClient({
@@ -538,6 +524,14 @@ export default {
     },
   },
   data() {
+    const validateFollowTime = (rule, value, callback) => {
+      const isFuture = new Date(value) > new Date()
+      if (isFuture) {
+        callback(new Error('error'))
+      } else {
+        callback()
+      }
+    }
     return {
       pageTitle: '我的客户',
       currentRouteName: 'MyClientsMy',
@@ -749,19 +743,25 @@ export default {
         star: 0,
         follow_time: new Date(),
       },
+      followFormRule: {
+        content: [
+          {
+            required: true,
+          },
+        ],
+        follow_time: [
+          {
+            required: true,
+            message: '你预知未来吗？',
+            validator: validateFollowTime,
+          },
+        ],
+      },
       fileList: [
-        {
-          fileName: 'a16 文件',
-          fileUrl: 'http://www.baidu.com/a16.zip',
-        },
-        {
-          fileName: 'a17 文件',
-          fileUrl: 'http://www.baidu.com/a16.zip',
-        },
-        {
-          fileName: 'a18 文件',
-          fileUrl: 'http://www.baidu.com/a16.zip',
-        },
+        // {
+        //   fileName: 'a16 文件',
+        //   fileUrl: 'http://www.baidu.com/a16.zip',
+        // },
       ],
     }
   },
