@@ -138,6 +138,14 @@
               </el-button>
             </div>
             <div class="operation-row">
+              <el-button
+                plain
+                type="primary"
+                size="mini"
+                @click.native.prevent.stop="handleFollowHistory(scope.row.id)"
+              >
+                跟进记录
+              </el-button>
               <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleTakeInClient(scope.row.id)"
                 >领取客户
               </el-button>
@@ -186,6 +194,8 @@
         <el-button type="primary" @click="onExportAllConfirm">确 定</el-button>
       </span>
     </el-dialog>
+
+    <follow-log :followHistoryId="followHistoryId" @onClose="followHistoryId = 0"></follow-log>
   </div>
 </template>
 
@@ -199,10 +209,12 @@ import { clientCategoryOptions,
   clientLevelOptions,
   clientSourceOptions } from '@/util/common'
 import localStore from '@/model/local'
+import followLog from './follow-log'
 
 export default {
   components: {
     fileAttachment,
+    followLog,
   },
   created() {
     // todo: need user input sanitazation
@@ -223,6 +235,10 @@ export default {
     this.asyncLocalDb()
   },
   methods: {
+    handleFollowHistory(id) {
+      this.followHistoryId = id
+      // this.loadFollowLog()
+    },
     onSearchFieldRemove(fieldName) {
       this.activeSearchFields = this.activeSearchFields.filter(item => item !== fieldName)
     },
@@ -468,6 +484,7 @@ export default {
   },
   data() {
     return {
+      followHistoryId: 0,
       pageTitle: '公海客户',
       currentRouteName: 'publicSea',
       activeSearchFieldsKey: 'publicSea-searchFieldsActive',

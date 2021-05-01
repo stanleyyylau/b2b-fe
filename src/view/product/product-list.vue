@@ -37,13 +37,7 @@
               </el-button>
             </div>
             <div class="operation-row">
-              <el-button
-                v-permission="['新增产品']"
-                plain
-                type="primary"
-                size="mini"
-                @click.native.prevent.stop="handleDrawer(scope.row.id)"
-              >
+              <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleDrawer(scope.row.id)">
                 文件
               </el-button>
               <el-button
