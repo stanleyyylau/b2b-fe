@@ -61,22 +61,32 @@
     </div>
 
     <!--file drawer-->
-    <el-drawer title="产品关联的文件" :visible.sync="showDrawer" direction="rtl" :before-close="handleClose">
-      <div>
-        <input ref="fileInput" type="file" :disabled="isFileUploading" />
-        <button @click="handleUpload" :disabled="isFileUploading">
-          {{ isFileUploading ? 'uploading' : 'upload' }}
-        </button>
-      </div>
-      <el-table :data="fileList" style="width: 100%">
-        <el-table-column prop="fileName" label="文件名" width="180"> </el-table-column>
-        <el-table-column label="下载" width="180">
-          <template slot-scope="scope">
-            <a :href="scope.row.fileUrl" target="_blank">downlnoad</a>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-drawer>
+    <!--    <el-drawer title="产品关联的文件" :visible.sync="showDrawer" direction="rtl" :before-close="handleClose">-->
+    <!--      <div>-->
+    <!--        <input ref="fileInput" type="file" :disabled="isFileUploading" />-->
+    <!--        <button @click="handleUpload" :disabled="isFileUploading">-->
+    <!--          {{ isFileUploading ? 'uploading' : 'upload' }}-->
+    <!--        </button>-->
+    <!--      </div>-->
+    <!--      <el-table :data="fileList" style="width: 100%">-->
+    <!--        <el-table-column prop="fileName" label="文件名" width="180"> </el-table-column>-->
+    <!--        <el-table-column label="下载" width="180">-->
+    <!--          <template slot-scope="scope">-->
+    <!--            <a :href="scope.row.fileUrl" target="_blank">downlnoad</a>-->
+    <!--          </template>-->
+    <!--        </el-table-column>-->
+    <!--      </el-table>-->
+    <!--    </el-drawer>-->
+
+    <file-attachment
+      title="产品关联的文件"
+      :visible="showDrawerForSpuId !== 0"
+      @close="handleClose"
+      :fileList="fileList"
+      @uploaded="handleUploaded"
+      @onFileDelete="deleteClientFileById"
+      @onFileNameUpdate="updateClientFileName"
+    />
 
     <!--    <el-dialog title="产品详情" :visible.sync="dialogTableVisible" @close="viewProductClose" width="80%">-->
     <!--      <div class="product-preview">-->
@@ -151,9 +161,12 @@
 <script>
 import product from '@/model/product'
 import category from '@/model/category'
+import fileAttachment from '@/component/common/file-attachment'
 
 export default {
-  components: {},
+  components: {
+    fileAttachment,
+  },
   async created() {
     const res = await category.getSecondLevelCategories()
     this.cates = res
@@ -161,6 +174,9 @@ export default {
     await this.getProducts()
   },
   methods: {
+    handleClose() {
+      this.showDrawerForSpuId = 0
+    },
     getCategoryNameById(id) {
       const match = this.categoryFromServer.filter(cate => String(cate.id) === String(id))
       return match[0].name
@@ -233,6 +249,7 @@ export default {
       console.log(this.showDrawerForSpuId)
       const res = await product.getFileBySpuId(this.showDrawerForSpuId)
       this.fileList = res.map(item => ({
+        id: item.id,
         fileName: item.file_name,
         fileUrl: item.file_url,
       }))
@@ -245,6 +262,39 @@ export default {
       const { files } = this.$refs.fileInput
       console.log(files)
       this.sendRequest(files[0])
+    },
+    async handleUploaded(res) {
+      console.log('uploaded result is', res)
+      // await product.createFileForClient({
+      //   client_id: this.showDrawerForClientId,
+      //   file_name: res[0].key,
+      //   file_url: res[0].url,
+      // })
+      await product.createFileForSpu({
+        spu_id: this.showDrawerForSpuId,
+        file_name: res[0].key,
+        file_url: res[0].url,
+      })
+      await this.getFileList()
+    },
+    async deleteClientFileById(fileId) {
+      console.log('delete', fileId)
+      try {
+        await product.deleteProductFileById(fileId)
+        this.$message('删除成功')
+        this.getFileList()
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async updateClientFileName(fileId, newName) {
+      try {
+        await product.updateProductFileName(fileId, newName)
+        this.$message('更新成功')
+        this.getFileList()
+      } catch (e) {
+        console.log(e)
+      }
     },
     sendRequest(file) {
       const self = this
@@ -282,7 +332,7 @@ export default {
       dialogTableVisible: false,
       productDetailFromServer: {},
       showDrawer: false,
-      showDrawerForSpuId: '',
+      showDrawerForSpuId: 0,
       isFileUploading: false,
       tableColumn: [
         {

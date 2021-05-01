@@ -99,10 +99,27 @@ class Product {
     })
   }
 
+  async deleteProductFileById(id) {
+    return _axios({
+      method: 'delete',
+      url: `v1/pms-product-files/${id}`,
+    })
+  }
+
   async updateClientFileName(id, newName) {
     return _axios({
       method: 'put',
       url: `v1/cms-client-files/${id}`,
+      data: {
+        fileName: newName,
+      },
+    })
+  }
+
+  async updateProductFileName(id, newName) {
+    return _axios({
+      method: 'put',
+      url: `v1/pms-product-files/${id}`,
       data: {
         fileName: newName,
       },

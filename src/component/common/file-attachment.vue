@@ -32,18 +32,35 @@
           <template slot-scope="scope">
             <el-button
               @click="handleDownload(scope.row.id, scope.row.fileUrl, scope.row.fileName)"
-              :loading="scope.isDownloading"
-              :disabled="scope.isDownloading"
+              :loading="scope.row.isDownloading"
+              :disabled="scope.row.isDownloading"
               v-if="fileEditId !== scope.row.id"
               size="mini"
               >{{ scope.row.isDownloading ? '下载中...' : '下载' }}
             </el-button>
-            <el-button v-if="fileEditId !== scope.row.id" size="mini" @click="handleEdit(scope.row)">编辑 </el-button>
-            <el-button v-if="fileEditId === scope.row.id" size="mini" @click="handleUpdate(scope.row.id)"
+            <el-button
+              v-if="fileEditId !== scope.row.id && !scope.row.isDownloading"
+              size="mini"
+              @click="handleEdit(scope.row)"
+              >编辑
+            </el-button>
+            <el-button
+              v-if="fileEditId === scope.row.id && !scope.row.isDownloading"
+              size="mini"
+              @click="handleUpdate(scope.row.id)"
               >更新
             </el-button>
-            <el-button v-if="fileEditId === scope.row.id" size="mini" @click="handleEditCancel">取消 </el-button>
-            <el-button v-if="fileEditId !== scope.row.id" size="mini" type="danger" @click="handleDelete(scope.row.id)"
+            <el-button
+              v-if="fileEditId === scope.row.id && !scope.row.isDownloading"
+              size="mini"
+              @click="handleEditCancel"
+              >取消
+            </el-button>
+            <el-button
+              v-if="fileEditId !== scope.row.id && !scope.row.isDownloading"
+              size="mini"
+              type="danger"
+              @click="handleDelete(scope.row.id)"
               >删除
             </el-button>
           </template>
