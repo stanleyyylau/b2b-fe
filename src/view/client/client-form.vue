@@ -81,7 +81,7 @@
             </div>
           </el-card>
         </el-form-item>
-        <el-form-item label="客户代码" prop="code" required>
+        <el-form-item label="客户代码" prop="code">
           <el-input size="medium" placeholder="code" v-model="form.code"></el-input>
         </el-form-item>
         <el-form-item label="等级" prop="client_level">
@@ -159,6 +159,7 @@ export default {
         })),
       }
       this.form.oldEmail = this.form.email
+      this.form.oldCode = this.form.code
       console.log('res is', res)
       console.log(this.form)
     },
@@ -237,6 +238,21 @@ export default {
         })
       }
     }
+    const validateCode = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('error'))
+      } else if (this.form.oldCode === this.form.code) {
+        callback()
+      } else {
+        client.isCodeValidForSignUp(value).then(result => {
+          if (result) {
+            callback()
+          } else {
+            callback(new Error('已存在'))
+          }
+        })
+      }
+    }
     return {
       formRules: {
         email: [
@@ -251,6 +267,21 @@ export default {
           {
             validator: validateEmail,
             message: '邮箱已存在，归属公海或其他业务，请更换邮箱或联系管理员',
+            trigger: 'blur',
+          },
+        ],
+        code: [
+          {
+            required: true,
+            message: '客户代码格式错误',
+            trigger: 'blur',
+            type: 'string',
+            // eslint-disable-next-line no-control-regex
+            pattern: /^[A-Z]{2}[0-9]{2}[A-Z]{3}$/,
+          },
+          {
+            validator: validateCode,
+            message: '客户代码重复',
             trigger: 'blur',
           },
         ],
@@ -302,6 +333,7 @@ export default {
           },
         ],
         code: '',
+        oldCode: '',
         client_level: 'C 普通客户',
         industry: '未知',
         source: '阿里',

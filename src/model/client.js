@@ -158,6 +158,14 @@ class Client {
     })
     return res.isValid
   }
+
+  async isCodeValidForSignUp(code) {
+    const res = await _axios({
+      method: 'get',
+      url: `v1/cms-client-info/checkValidCode/${code}`,
+    })
+    return res.isValid
+  }
 }
 
 export default new Client()
