@@ -116,6 +116,21 @@ class Client {
     })
   }
 
+  async updateFollowLog(id, data) {
+    return _axios({
+      method: 'put',
+      url: `v1/cms-client-follow-log/${id}`,
+      data,
+    })
+  }
+
+  async deleteFollowLog(id) {
+    return _axios({
+      method: 'delete',
+      url: `v1/cms-client-follow-log/${id}`,
+    })
+  }
+
   async listFollowLog(id) {
     const res = await _axios({
       method: 'get',

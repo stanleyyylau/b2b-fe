@@ -13,7 +13,7 @@ function checkAddZone(num) {
 export const replaceOwnedByWithName = async list => {
   const users = await _axios({
     method: 'get',
-    url: 'cms/user/list',
+    url: 'cms/user/listForReplace',
   })
   return list.map(item => ({
     ...item,

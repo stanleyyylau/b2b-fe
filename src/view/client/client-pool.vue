@@ -184,6 +184,8 @@
       @close="handleClose"
       :fileList="fileList"
       @uploaded="handleUploaded"
+      @onFileDelete="deleteClientFileById"
+      @onFileNameUpdate="updateClientFileName"
     />
 
     <!-- export all-->
@@ -460,6 +462,25 @@ export default {
     handleDrawer(id) {
       this.showDrawerForClientId = id
       this.getFileList()
+    },
+    async deleteClientFileById(fileId) {
+      console.log('delete', fileId)
+      try {
+        await product.deleteClientFileById(fileId)
+        this.$message('删除成功')
+        await this.getFileList()
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async updateClientFileName(fileId, newName) {
+      try {
+        await product.updateClientFileName(fileId, newName)
+        this.$message('更新成功')
+        await this.getFileList()
+      } catch (e) {
+        console.log(e)
+      }
     },
     async handleUploaded(res) {
       console.log('uploaded result is', res)

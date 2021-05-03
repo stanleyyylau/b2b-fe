@@ -1,8 +1,17 @@
 <template>
   <div>
+    <!--    <el-row v-if="disalbedEdit"><el-button @click="back()">返回</el-button></el-row>-->
     <el-row v-loading="loadingForEdit">
       <el-col :lg="20" :md="20" :sm="24" :xs="24">
-        <el-form :model="form" status-icon ref="form" :rules="dataRule" label-width="150px" @submit.native.prevent>
+        <el-form
+          :model="form"
+          status-icon
+          ref="form"
+          :rules="dataRule"
+          label-width="150px"
+          @submit.native.prevent
+          :disabled="disalbedEdit"
+        >
           <el-form-item label="合同日期" prop="contract_time">
             <el-date-picker type="date" v-model="form.contract_time" placeholder="Select date and time">
             </el-date-picker>
@@ -239,6 +248,9 @@ export default {
     this.loadingForEdit = false
   },
   methods: {
+    back() {
+      this.$router.back()
+    },
     getPriceValidRules() {
       return priceNumValidatorRules
     },
@@ -614,6 +626,9 @@ export default {
       if (this.form.review_status) return false
       if (this.form.payment_status === '款项收齐') return true
       return false
+    },
+    disalbedEdit() {
+      return this.editId !== 0 && this.form.review_status === '已审核'
     },
   },
 }

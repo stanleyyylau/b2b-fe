@@ -2,7 +2,10 @@
   <div>
     <!-- 列表页面 -->
     <div class="container">
-      <div class="header"><div class="title">编辑合同</div></div>
+      <div class="header">
+        <div class="title">编辑合同</div>
+        <div class="back"><el-button @click="back()" type="primary">返回</el-button></div>
+      </div>
     </div>
 
     <contractForm :edit-id="editId" :loading="loading" @addOrUpdate="handleUpdate" />
@@ -21,11 +24,19 @@ export default {
     this.editId = Number(this.$router.history.current.query.id) || 0
   },
   methods: {
+    back() {
+      this.$router.back()
+    },
     async handleUpdate(data) {
       this.loading = true
-      await contract.update(this.editId, data)
-      this.loading = false
-      this.$router.back()
+      try {
+        await contract.update(this.editId, data)
+        this.loading = false
+        this.$router.back()
+      } catch (e) {
+        console.log(e)
+        this.loading = false
+      }
     },
   },
   data() {

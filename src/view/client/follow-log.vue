@@ -25,13 +25,43 @@
           <div v-if="loading">loading...</div>
           <div v-if="loading === false && followHistory.length === 0">无跟进历史</div>
           <el-card v-bind:key="index" class="box-card" v-for="(item, index) in followHistory">
-            <div>
-              <div>{{ item.create_time }} - {{ item.followBy }}</div>
-              <div><el-rate :disabled="true" :value="item.star"></el-rate></div>
-            </div>
-            <div>
-              {{ item.content }}
-            </div>
+            <template v-if="index !== editingIndex">
+              <div class="meta-row">
+                <div class="auther-row">
+                  <div class="auther-info">{{ item.create_time }} - {{ item.followBy }}</div>
+                  <div class="update-buttons">
+                    <el-button plain @click="onUpdateClick(index)">更新</el-button>
+                    <el-button plain @click="onDeleteClick(index)">删除</el-button>
+                  </div>
+                </div>
+                <div><el-rate :disabled="true" :value="item.star"></el-rate></div>
+              </div>
+              <div>
+                {{ item.content }}
+              </div>
+            </template>
+            <template v-if="index === editingIndex">
+              <div class="meta-row">
+                <div class="auther-row">
+                  <div class="auther-info">
+                    <el-date-picker
+                      v-model="editingForm.follow_time"
+                      type="datetime"
+                      placeholder="Select date and time"
+                    ></el-date-picker>
+                    - {{ item.followBy }}
+                  </div>
+                  <div class="update-buttons">
+                    <el-button plain @click="conUpdateConfirm" :loading="updating">确认</el-button>
+                    <el-button plain @click="onCancalUpdate" :disabled="updating">取消</el-button>
+                  </div>
+                </div>
+                <div><el-rate v-model="editingForm.star"></el-rate></div>
+              </div>
+              <div>
+                <el-input type="textarea" v-model="editingForm.content"></el-input>
+              </div>
+            </template>
           </el-card>
         </div>
       </el-form>
@@ -59,6 +89,7 @@ export default {
       }
     }
     return {
+      updating: false,
       loading: true,
       followHistory: [
         // {
@@ -68,8 +99,14 @@ export default {
         //   followBy: 'stanley',
         // },
       ],
+      editingIndex: null,
       addingLog: false,
       followForm: {
+        content: '',
+        star: 0,
+        follow_time: new Date(),
+      },
+      editingForm: {
         content: '',
         star: 0,
         follow_time: new Date(),
@@ -96,6 +133,54 @@ export default {
     },
   },
   methods: {
+    async onDeleteClick(index) {
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(async () => {
+        const { id } = this.followHistory[index]
+        const res = await client.deleteFollowLog(id)
+        if (res.code < window.MAX_SUCCESS_CODE) {
+          await this.loadFollowLog()
+          this.$message({
+            type: 'success',
+            message: `${res.message}`,
+          })
+        }
+      })
+    },
+    async conUpdateConfirm() {
+      // validate
+      if (!this.editingForm.content) {
+        return this.$message('内容不能为空')
+      }
+      if (!this.editingForm.follow_time) {
+        return this.$message('日期不能为空')
+      }
+      if (this.editingForm.follow_time > new Date()) {
+        return this.$message('你预知未来吗?')
+      }
+      // todo: good to go, emit event for parent to handle
+      try {
+        this.updating = true
+        await client.updateFollowLog(this.followHistory[this.editingIndex].id, this.editingForm)
+        this.updating = false
+        this.editingIndex = null
+        this.editingForm = {}
+        await this.loadFollowLog()
+      } catch (e) {
+        this.updating = false
+      }
+    },
+    onUpdateClick(index) {
+      this.editingIndex = index
+      this.editingForm = { ...this.followHistory[index], follow_time: new Date(this.followHistory[index].create_time) }
+    },
+    onCancalUpdate() {
+      this.editingIndex = null
+      this.editingForm = {}
+    },
     async handleFollowSubmit() {
       const isValid = await this.$refs.followForm.validate()
       if (!isValid) return
@@ -120,6 +205,7 @@ export default {
       const res = await client.listFollowLog(clientId)
       this.loading = false
       this.followHistory = res.map(item => ({
+        id: item.id,
         create_time: item.follow_time,
         content: item.content,
         star: item.star,
@@ -153,5 +239,10 @@ export default {
 
 .followCards {
   margin-left: 25px;
+}
+.auther-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
