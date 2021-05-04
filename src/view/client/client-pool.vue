@@ -67,7 +67,7 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button type="primary">导入数据</el-button>
+        <el-button type="primary" @click="importDialog = true">导入数据</el-button>
         <el-button type="primary" @click="exportAllVisible = true">导出数据</el-button>
         <el-button
           @click="onSearch"
@@ -197,6 +197,52 @@
       </span>
     </el-dialog>
 
+    <!-- import-->
+    <el-dialog title="从 CSV 导入数据" :visible.sync="importDialog">
+      <template v-if="successList.length > 0 || failList.length > 0">
+        <div class="import-result">
+          <div>导入完成，成功导入 {{ successList.length }} 条数据</div>
+          <div>下面的导入失败的列表</div>
+        </div>
+        <el-table :data="failList" style="width: 100%">
+          <template v-for="field in fields">
+            <el-table-column
+              v-bind:key="field.name"
+              v-if="field.isShow && field.name !== 'create_time'"
+              :prop="field.name"
+              :label="field.displayName"
+              width="180"
+            >
+            </el-table-column>
+          </template>
+        </el-table>
+        <div class="download-buttons">
+          <el-button @click="downloadFailCSV" :disabled="failList.length === 0">下载列表</el-button>
+          <el-button @click="onReimport">重新导入</el-button>
+        </div>
+      </template>
+      <template v-else>
+        <el-upload action="" class="upload-csv" ref="upload" :limit="1" :auto-upload="false">
+          <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
+          <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">加载数据</el-button>
+          <el-button @click="downloadExampleCSV" size="small">下载 example.csv</el-button>
+        </el-upload>
+        <el-table :data="goodCSVTable" style="width: 100%">
+          <template v-for="field in fields">
+            <el-table-column
+              v-bind:key="field.name"
+              v-if="field.isShow && field.name !== 'create_time'"
+              :prop="field.name"
+              :label="field.displayName"
+              width="180"
+            >
+            </el-table-column>
+          </template>
+        </el-table>
+        <el-button v-if="goodCSVTable.length > 0" @click="importConfirm" :loading="isImporting">确认导出</el-button>
+      </template>
+    </el-dialog>
+
     <follow-log :followHistoryId="followHistoryId" @onClose="followHistoryId = 0"></follow-log>
   </div>
 </template>
@@ -209,7 +255,10 @@ import { clientCategoryOptions,
   clientCountryOptions,
   clientIndustryOptions,
   clientLevelOptions,
-  clientSourceOptions } from '@/util/common'
+  clientSourceOptions,
+  generateClientCode,
+  JSONtoCSV,
+  parseCSV } from '@/util/common'
 import localStore from '@/model/local'
 import followLog from './follow-log'
 
@@ -235,8 +284,66 @@ export default {
     this.onSearch()
     this.initSearchForm()
     this.asyncLocalDb()
+    // this.downloadExampleCSV()
   },
   methods: {
+    async importConfirm() {
+      this.isImporting = true
+      try {
+        const res = await client.importClientToSea(this.goodCSVTable)
+        this.successList = res.successList
+        this.failList = [...this.badCSVTable, ...res.failList]
+        // this.isImporting = false
+        console.log('import res', res)
+      } catch (e) {
+        console.log(e)
+      }
+      this.isImporting = false
+    },
+    submitUpload() {
+      const self = this
+      console.log('hihi')
+      const uploadRef = this.$refs.upload
+      const file = uploadRef.uploadFiles[0]
+
+      const reader = new FileReader()
+      reader.onload = function () {
+        console.log('data reaa', reader.result)
+        // const cleanResult = reader.result.replace(/\n"/g, '"')
+        try {
+          const rows = parseCSV(reader.result)
+          console.log('parse data', rows)
+          const headerRow = rows.shift()
+          console.log('header rows', headerRow)
+          const indexFieldNameMap = {}
+          headerRow.forEach((displayName, index) => {
+            const { name } = self.fields.filter(field => field.displayName === displayName)[0]
+            indexFieldNameMap[index] = name
+          })
+          const tableRow = rows.map(row => {
+            const obj = {}
+            row.forEach((value, index) => {
+              obj[indexFieldNameMap[index]] = value
+            })
+            return obj
+          })
+          console.log('rest rows', rows)
+          console.log('table row', tableRow)
+          self.csvTable = tableRow
+          // rows.shift()
+          // rows = rows.filter(row => row.length === 2 && row[0] !== '' && row[1] !== '')
+          // const parseData = rows.map(row => ({
+          //   email: row[0].trim(),
+          //   name: row[1].trim()
+          // }))
+          // self.csv = parseData
+          // console.log(self.csv)
+        } catch (e) {
+          self.$message('CSV格式错误')
+        }
+      }
+      reader.readAsText(file.raw)
+    },
     handleFollowHistory(id) {
       this.followHistoryId = id
       // this.loadFollowLog()
@@ -351,18 +458,18 @@ export default {
       }
     },
     async initSearchForm() {
-      let targetIndex
-      for (let i = 0; i < this.searchFields.length - 1; i++) {
-        const currentField = this.searchFields[i]
-        if (currentField.name === 'owned_by') {
-          targetIndex = i
-        }
-      }
-      this.searchFields[targetIndex].loading = true
-      const userOptions = await client.listUserOptions()
-      console.log('list user', userOptions)
-      this.searchFields[targetIndex].loading = false
-      this.searchFields[targetIndex].options = userOptions
+      // let targetIndex
+      // for (let i = 0; i < this.searchFields.length - 1; i++) {
+      //   const currentField = this.searchFields[i]
+      //   if (currentField.name === 'owned_by') {
+      //     targetIndex = i
+      //   }
+      // }
+      // this.searchFields[targetIndex].loading = true
+      // const userOptions = await client.listUserOptions()
+      // console.log('list user', userOptions)
+      // this.searchFields[targetIndex].loading = false
+      // this.searchFields[targetIndex].options = userOptions
     },
     async onSearch() {
       this.$router.push({
@@ -482,6 +589,61 @@ export default {
         console.log(e)
       }
     },
+    downloadExampleCSV() {
+      const headerRow = {}
+      const excludeFields = ['create_time']
+      this.fields.forEach(field => {
+        if (field.isShow && !excludeFields.includes(field.name)) {
+          headerRow[field.displayName] = ''
+        }
+      })
+      const data = [headerRow]
+      // const data = [
+      //   {
+      //     'Column 1': '1-1',
+      //     'Column 2': '1-2',
+      //     'Column 3': '1-3',
+      //     'Column 4': '1-4'
+      //   },
+      //   {
+      //     'Column 1': '2-1',
+      //     'Column 2': '2-2',
+      //     'Column 3': '2-3',
+      //     'Column 4': '2-4'
+      //   },
+      //   {
+      //     'Column 1': '3-1',
+      //     'Column 2': '3-2',
+      //     'Column 3': '3-3',
+      //     'Column 4': '3-4'
+      //   },
+      //   {
+      //     'Column 1': 4,
+      //     'Column 2': 5,
+      //     'Column 3': 6,
+      //     'Column 4': 7
+      //   }
+      // ]
+      JSONtoCSV(data)
+    },
+    downloadFailCSV() {
+      const self = this
+      const exportList = this.failList.map(item => {
+        const obj = {}
+        self.fields.forEach(field => {
+          if (field.isShow && field.name !== 'create_time') {
+            obj[field.displayName] = item[field.name]
+          }
+        })
+        return obj
+      })
+      JSONtoCSV(exportList, 'failList.csv')
+    },
+    onReimport() {
+      this.successList = []
+      this.failList = []
+      this.csvTable = []
+    },
     async handleUploaded(res) {
       console.log('uploaded result is', res)
       await product.createFileForClient({
@@ -505,6 +667,10 @@ export default {
   },
   data() {
     return {
+      successList: [],
+      failList: [],
+      isImporting: false,
+      importDialog: false,
       followHistoryId: 0,
       pageTitle: '公海客户',
       currentRouteName: 'publicSea',
@@ -675,6 +841,7 @@ export default {
       showDrawerForClientId: 0,
       fileList: [],
       clients: [],
+      csvTable: [],
     }
   },
   computed: {
@@ -688,6 +855,51 @@ export default {
     },
     activeSearchFieldsFullData() {
       return this.activeSearchFields.map(fieldName => this.searchFields.filter(field => field.name === fieldName)[0])
+    },
+    goodCSVTable() {
+      return this.csvTable.filter(row => {
+        // valid country
+        if (row.country) {
+          if (clientCountryOptions.filter(country => country.label === row.country).length === 0) return false
+        }
+
+        // valid client level
+        if (row.client_level) {
+          if (clientLevelOptions.filter(level => level.label === row.client_level).length === 0) return false
+        }
+
+        // valid client industry
+        if (row.industry) {
+          if (clientIndustryOptions.filter(industry => industry.label === row.industry).length === 0) return false
+        }
+
+        // generate client code if needed
+        if (!row.code) {
+          if (row.country && row.company_name) {
+            row.code = generateClientCode(row.country, row.company_name)
+          }
+        }
+        return true
+      })
+    },
+    badCSVTable() {
+      return this.csvTable.filter(row => {
+        // valid country
+        if (row.country) {
+          if (clientCountryOptions.filter(country => country.label === row.country).length === 0) return true
+        }
+
+        // valid client level
+        if (row.client_level) {
+          if (clientLevelOptions.filter(level => level.label === row.client_level).length === 0) return true
+        }
+
+        // valid client industry
+        if (row.industry) {
+          if (clientIndustryOptions.filter(industry => industry.label === row.industry).length === 0) return true
+        }
+        return false
+      })
     },
   },
 }

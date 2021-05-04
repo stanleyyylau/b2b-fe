@@ -1,6 +1,7 @@
 import * as accounting from 'accounting-js'
 import _axios from 'lin/plugin/axios'
-import country from '@/util/country'
+import Papa from 'papaparse'
+import allCountries from '@/util/country'
 
 const formatMoneyUSD = amount => `${accounting.formatMoney(amount, 'US$')}`
 const formatMoneyCNY = amount => `${accounting.formatMoney(amount, { symbol: '¥', format: '%s%v' })}`
@@ -196,7 +197,7 @@ export const clientSourceOptions = [
   },
 ]
 
-export const clientCountryOptions = country
+export const clientCountryOptions = allCountries
 
 export const clientCategoryOptions = [
   {
@@ -212,3 +213,46 @@ export const clientCategoryOptions = [
     label: '3C电子 （耳机，音箱，充电线）',
   },
 ]
+
+export const JSONtoCSV = (json, fileName = 'example.csv') => {
+  const csv = Papa.unparse(json)
+  if (!csv) {
+    return
+  }
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  // const blob = csv
+  const reader = new FileReader()
+  reader.readAsDataURL(blob) // base64
+  reader.onload = function (e) {
+    const a = document.createElement('a')
+    a.download = fileName
+    a.href = e.target.result
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+  console.log(csv)
+}
+
+// eslint-disable-next-line eqeqeq
+export const parseCSV = csv => Papa.parse(csv).data.filter(row => row != '')
+
+export const generateClientCode = (country, company_name) => {
+  console.log('generate client code')
+  if (!country) return
+  if (!company_name) return
+  const countryCode = clientCountryOptions.filter(item => item.label === country)[0].value
+  const yearCode = String(new Date().getFullYear()).substr(2)
+  const companyCode = company_name
+    .match(/[a-zA-Z0-9]/g)
+    .join('')
+    .toUpperCase()
+  // .substr(0, 3)
+  let code = ''
+  if (companyCode.length < 3) {
+    code = ''
+  } else {
+    code = `${countryCode}${yearCode}${companyCode.substr(0, 3)}`
+  }
+  return code
+}

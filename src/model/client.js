@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import _axios from '@/lin/plugin/axios'
-import { isObjNotEmpty, replaceOwnedByWithName } from '@/util/common'
+import { clientCountryOptions, isObjNotEmpty, replaceOwnedByWithName } from '@/util/common'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
 class Client {
@@ -165,6 +165,54 @@ class Client {
       url: `v1/cms-client-info/checkValidCode/${code}`,
     })
     return res.isValid
+  }
+
+  async importClientToSea(data) {
+    const self = this
+    const dataWithSea = data.map(item => ({
+      ...item,
+      country: self.replaceCountryLabelWithValue(item.country),
+      isInPublicSea: true,
+      is_in_public_sea: true,
+    }))
+    return this.importClientAndFilterResponse(dataWithSea)
+  }
+
+  async importClient(data) {
+    const self = this
+    const dataWithSea = data.map(item => ({
+      ...item,
+      country: self.replaceCountryLabelWithValue(item.country),
+      isInPublicSea: false,
+      is_in_public_sea: false,
+    }))
+    return this.importClientAndFilterResponse(dataWithSea)
+  }
+
+  async importClientAndFilterResponse(dataWithSea) {
+    const self = this
+    const res = await _axios({
+      method: 'post',
+      url: 'v1/cms-client-info/importClients/',
+      data: dataWithSea,
+    })
+    res.successList = res.successList.map(item => ({
+      ...item,
+      country: self.replaceCountryValueWithLabel(item.country),
+    }))
+    res.failList = res.failList.map(item => ({
+      ...item,
+      country: self.replaceCountryValueWithLabel(item.country),
+    }))
+    return res
+  }
+
+  replaceCountryLabelWithValue(label) {
+    return clientCountryOptions.filter(item => item.label === label)[0].value
+  }
+
+  replaceCountryValueWithLabel(value) {
+    return clientCountryOptions.filter(item => item.value === value)[0].label
   }
 }
 
