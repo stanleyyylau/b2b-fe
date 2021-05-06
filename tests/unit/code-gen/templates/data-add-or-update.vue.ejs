@@ -1,0 +1,157 @@
+<template>
+  <div>
+    <!--    <el-row v-if="disalbedEdit"><el-button @click="back()">返回</el-button></el-row>-->
+    <el-row v-loading="loadingForEdit">
+      <el-col :lg="20" :md="20" :sm="24" :xs="24">
+        <el-form
+          :model="dataForm"
+          :rules="dataRule"
+          ref="dataForm"
+          status-icon
+          label-width="150px"
+          @submit.native.prevent
+        >
+          <% for(let i=0; i < fields.length; i++) { const item = fields[i]; if(!item.isShow) continue;
+              switch (item.type) {
+              case 'Date':%>
+                <el-form-item label="<%= item.displayName %>" prop="<%= item.name %>">
+                    <el-date-picker type="date" v-model="dataForm.<%= item.name %>" placeholder="<%= item.displayName %>"></el-date-picker>
+                </el-form-item>
+                <%break;
+              case 'Enum':%>
+                <el-form-item label="<%= item.displayName %>" prop="<%= item.name %>">
+                    <el-select filterable v-model="dataForm.<%= item.name %>" placeholder="<%= item.displayName %>" :loading="fields[<%= i %>].loading">
+                        <el-option v-for="item in fields[<%= i %>].options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <%break;
+              default:%>
+                <el-form-item label="<%= item.displayName %>" prop="<%= item.name %>">
+                    <el-input v-model="dataForm.<%= item.name %>" placeholder="<%= item.displayName %>"></el-input>
+                </el-form-item>
+                  <%
+                  break;
+          }}%>
+          <el-form-item style="padding-bottom: 50px">
+            <el-button type="primary" v-on:click="dataFormSubmit" :loading="loading">{{
+              editId === '0' ? '新增合同' : '修改合同'
+            }}</el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import contract from '@/model/contract'
+
+export default {
+  props: {
+    editId: {
+      type: String
+    },
+  },
+  components: {},
+  created() {
+    this.initForm()
+  },
+  methods: {
+    async initForm() {
+        if (this.editId && this.editId !== '0') {
+            this.loadingForEdit = true
+            const formDetailRes = await contract.getDetail(this.editId)
+            <% for (let i = 0; i < fields.length; i++) {const item = fields[i]; %>
+            this.dataForm.<%= item.name %> = formDetailRes.<%= item.name %><%if(item.multiple){%>.split('')<%}%> <%}%>
+
+            this.loadingForEdit = false
+        }
+    },
+    back() {
+      this.$router.back()
+    },
+    async dataFormSubmit() {
+      const isValid = await this.$refs.form.validate()
+      if (!isValid) return false
+      const data = {
+          ...this.form,
+      }
+      this.loading = true
+      try {
+          if (this.editId === '0') {
+              await contract.create(data)
+          } else {
+              await contract.update(this.editId, data)
+          }
+          this.$message('操作成功')
+          this.back()
+      } catch (e) {
+          console.log(e)
+      }
+      this.loading = false
+    },
+  },
+  data() {
+    const dataFormRaw = <%- JSON.stringify(dataFormRaw, null, 2) %>
+    const computedForm = {}
+    const computedRules = {}
+    for (const dataFormKey in dataFormRaw) {
+      computedForm[dataFormKey] = dataFormRaw[dataFormKey].default
+      if (dataFormRaw[dataFormKey].type === 'Date') {
+          computedForm[dataFormKey] = new Date()
+      }
+      if (dataFormRaw[dataFormKey].rules) {
+          computedRules[dataFormKey] = [...dataFormRaw[dataFormKey].rules]
+      }
+    }
+    return {
+      dataForm: computedForm,
+      dataRule: computedRules,
+      loadingForEdit: false,
+      loading: false, // add/update button loading
+      fields: <%- JSON.stringify(fields, null, 2) %>
+    }
+  },
+  computed: {
+    isAdd() {
+      return this.editId === '0'
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.container {
+  padding: 0 30px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      height: 59px;
+      line-height: 59px;
+      color: $parent-title-color;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .productRow {
+    display: flex;
+  }
+
+  .el-input-group__append,
+  .el-input-group__prepend {
+    background: #a5acbb !important;
+    border: 1px solid #a5acbb !important;
+    color: #fff;
+  }
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px;
+  }
+}
+</style>

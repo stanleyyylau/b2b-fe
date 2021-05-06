@@ -186,40 +186,43 @@
 import localStore from '@/model/local'
 import importCsv from '@/component/common/import-csv'
 // todo: change model when needed
-import contract from '@/model/contract'
+import <%= modelName %> from '@/model/<%= modelName %>'
 import client from '@/model/client'
-import AddOrUpdate from './data-add-or-update'
+import addOrUpdate from './<%= collectionName %>-add-or-update'
 
 export default {
   components: {
     importCsv,
-    AddOrUpdate,
+    addOrUpdate
   },
   async created() {
     if (this.$route.query.editId) {
       console.log(this.$route.query.editId)
       this.editId = this.$route.query.editId
       this.showAddOrUpdate = true
-      return
+    } else {
+      this.initList()
     }
-    // todo: need user input sanitazation
-    this.pageCount = Number(this.$route.query.pageCount) || this.pageCount
-    this.currentPage = Number(this.$route.query.currentPage) || this.currentPage
-    if (!this.pageSizes.includes(Number(this.pageCount))) {
-      this.pageSizes = [this.pageCount].concat(this.pageSizes)
-    }
-    this.$router.push({
-      name: this.currentRouteName,
-      query: {
-        currentPage: this.currentPage,
-        pageCount: this.pageCount,
-      },
-    })
-    this.onSearch()
-    this.initSearchForm()
-    this.asyncLocalDb()
   },
   methods: {
+    initList() {
+      // todo: need user input sanitazation
+      this.pageCount = Number(this.$route.query.pageCount) || this.pageCount
+      this.currentPage = Number(this.$route.query.currentPage) || this.currentPage
+      if (!this.pageSizes.includes(Number(this.pageCount))) {
+        this.pageSizes = [this.pageCount].concat(this.pageSizes)
+      }
+      this.$router.push({
+        name: this.currentRouteName,
+        query: {
+          currentPage: this.currentPage,
+          pageCount: this.pageCount,
+        },
+      })
+      this.onSearch()
+      this.initSearchForm()
+      this.asyncLocalDb()
+    },
     onSearchFieldRemove(fieldName) {
       this.activeSearchFields = this.activeSearchFields.filter(item => item !== fieldName)
     },
@@ -306,7 +309,7 @@ export default {
       this.exportAllVisible = false
       this.loading = true
       console.log('export all data confirm')
-      const res = await contract.exportAll()
+      const res = await <%= modelName %>.exportAll()
       this.download(res, `${new Date().getTime()}.csv`)
       this.loading = false
     },
@@ -357,7 +360,7 @@ export default {
       //   newSearchform[item.name] = item.vmodel
       // })
       // todo: change this
-      const res = await contract.search(this.pageCount, page, this.searchForm)
+      const res = await <%= modelName %>.search(this.pageCount, page, this.searchForm)
       this.loading = false
       this.tableData = res.items
       this.total_nums = res.total
@@ -379,7 +382,7 @@ export default {
         type: 'warning',
       }).then(async () => {
         // todo: change when needed
-        const res = await contract.delete(val.row.id)
+        const res = await <%= modelName %>.delete(val.row.id)
         if (res.code < window.MAX_SUCCESS_CODE) {
           await this.onSearch()
           this.$message({
@@ -420,181 +423,18 @@ export default {
   },
   data() {
     return {
-      pageTitle: '我的合同',
-      currentRouteName: 'template',
-      activeSearchFieldsKey: 'template-searchFieldsActive',
-      displayFieldsKey: 'template-displayFields',
+      pageTitle: '<%= collectionDisplayName %>',
+      currentRouteName: '<%= collectionName %>',
+      activeSearchFieldsKey: '<%= collectionName %>-searchFieldsActive',
+      displayFieldsKey: '<%= collectionName %>-displayFields',
       pageSizes: [10, 20, 30, 50],
       total_nums: 0, // 分组内的用户总数
       currentPage: 1, // 默认获取第一页的数据
       pageCount: 10, // 每页10条数据
       searchForm: {}, // this form is computed by search fields
       activeSearchFields: [], // computed
-      searchFields: [
-        {
-          displayName: '业务员',
-          name: 'owned_by',
-          type: 'Connect',
-          loading: true,
-          options: [],
-        },
-        {
-          displayName: 'PI编号',
-          name: 'PI_NO',
-          type: 'String',
-        },
-        {
-          displayName: '付款状态',
-          name: 'payment_status',
-          type: 'Enum',
-          options: [
-            {
-              value: '支付预付款',
-              label: '支付预付款',
-            },
-            {
-              value: '款项收齐',
-              label: '款项收齐',
-            },
-            {
-              value: '其他',
-              label: '其他',
-            },
-          ],
-        },
-        {
-          displayName: '审核状态',
-          name: 'review_status',
-          type: 'Enum',
-          options: [
-            {
-              value: '已审核',
-              label: '已审核',
-            },
-            {
-              value: '拒绝',
-              label: '拒绝',
-            },
-            {
-              value: '审核中',
-              label: '审核中',
-            },
-          ],
-        },
-        {
-          displayName: '付款方式',
-          name: 'payment_method',
-          type: 'Enum',
-          options: [
-            {
-              value: '阿里信保',
-              label: '阿里信保',
-            },
-            {
-              value: '美金账户',
-              label: '美金账户',
-            },
-            {
-              value: 'PayPal',
-              label: 'PayPal',
-            },
-            {
-              value: '人民币私账',
-              label: '人民币私账',
-            },
-            {
-              value: '1688',
-              label: '1688',
-            },
-          ],
-        },
-      ], // todo: change when needed
-      fields: [
-        {
-          name: 'id',
-          displayName: 'id',
-          isHidden: true,
-          isShow: false,
-          sortable: true,
-        },
-        {
-          name: 'pino',
-          displayName: 'PI编号',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'ownedBy',
-          displayName: '业务员',
-          isHidden: false,
-          isShow: true,
-          sortable: false,
-        },
-        {
-          name: 'contract_time',
-          displayName: '合同时间',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'delivery_time',
-          displayName: '收货时间',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'total_amount',
-          displayName: '总金额',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'actual_delivery_fee',
-          displayName: '实际运费',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'payment_method',
-          displayName: '付款方式',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'payment_status',
-          displayName: '支付状态',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'raw_cost',
-          displayName: '成本价',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'review_status',
-          displayName: '审核状态',
-          isHidden: false,
-          isShow: true,
-          sortable: true,
-        },
-        {
-          name: 'client_id',
-          displayName: '客户ID',
-          isHidden: true,
-          isShow: false,
-          sortable: true,
-        },
-      ], // todo: change when needed
+      searchFields: <%- JSON.stringify(searchFields, null, 2) %>, // todo: change when needed
+      fields: <%- JSON.stringify(fields, null, 2) %>, // todo: change when needed
       loading: true, // main table loading status
       tableData: [], // needless to say
       selectionList: [], // selected rows
@@ -625,8 +465,7 @@ export default {
       const excludeFieldDisplayName = ['id', '创建时间', '地址', '备注', '分类', '来源']
       return this.fields.filter(field => !excludeFieldDisplayName.includes(field.displayName))
     },
-    goodCSVTable() {
-      // client side csv validation
+    goodCSVTable() { // client side csv validation
       // eslint-disable-next-line no-unused-vars
       return this.csvTable.filter(row => {
         // todo: add client side validation here
@@ -655,8 +494,7 @@ export default {
         return true
       })
     },
-    badCSVTable() {
-      // client side csv validation
+    badCSVTable() { // client side csv validation
       // eslint-disable-next-line no-unused-vars
       return this.csvTable.filter(row => {
         // todo: add client side validation here
@@ -687,8 +525,13 @@ export default {
         this.editId = val
         console.log('do stuff')
       }
-    },
-  },
+      if (!val) {
+        this.showAddOrUpdate = false
+        this.editId = null
+        this.initList()
+      }
+    }
+  }
 }
 </script>
 
