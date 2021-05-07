@@ -21,3 +21,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+/src/model/contractModel.js
+/tests/unit/code-gen/contract-add-or-update.vue
+/tests/unit/code-gen/contract-list.vue
+/tests/unit/code-gen/contractModel.js

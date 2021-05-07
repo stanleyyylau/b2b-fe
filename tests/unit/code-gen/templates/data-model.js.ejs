@@ -56,17 +56,10 @@ class <%= modelName.charAt(0).toUpperCase() + modelName.slice(1) %> {
       url: `<%= endpointBasePath %>/page?count=${count}&page=${curPage}`,
       data,
     })
-    console.log('page res', res)
-    const filterResult = await this.postFilterContractList(res.items)
     return {
       ...res,
-      items: filterResult,
+      items: res.items,
     }
-  }
-
-  async postFilterContractList(list) {
-    const withOwnBy = await replaceOwnedByWithName(list)
-    return this.contractFilter(withOwnBy)
   }
 
   async exportAll() {

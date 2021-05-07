@@ -57,6 +57,7 @@
         </el-form>
       </div>
       <div class="main-operation-row">
+        <el-button type="primary" @click="onCreateClick" class="create">新增</el-button>
         <el-dropdown :hide-on-click="false" trigger="click" class="addSearchButton">
           <el-button type="primary" icon="el-icon-aim">
             添加检索
@@ -93,7 +94,7 @@
           <el-col :span="6"> 已选中 {{ selectionList.length }} 项 </el-col>
           <el-col :span="6">
             <div class="selection-button-wrap">
-              <el-button>删除文档</el-button>
+              <el-button @click="handleDelete()">删除文档</el-button>
               <el-button>导出数据</el-button>
               <el-button @click="toggleSelection">取消选择</el-button>
             </div>
@@ -131,7 +132,7 @@
             <el-button plain type="primary" size="mini" @click.native.prevent.stop="handleEdit(scope)">
               编辑
             </el-button>
-            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope)">删除</el-button>
+            <el-button plain type="danger" size="mini" @click.native.prevent.stop="handleDelete(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
 
@@ -178,7 +179,13 @@
     </el-dialog>
   </div>
   <div v-else>
-    <add-or-update :editId="editId"></add-or-update>
+    <div class="container">
+      <div class="header">
+        <div class="title">{{ editId === '0' ? '新增' : '编辑' }}</div>
+        <div class="back"><el-button @click="back" type="primary">返回</el-button></div>
+      </div>
+      <add-or-update :editId="editId"></add-or-update>
+    </div>
   </div>
 </template>
 
@@ -205,6 +212,14 @@ export default {
     }
   },
   methods: {
+    onCreateClick() {
+      this.$router.push({
+        name: this.currentRouteName,
+        query: {
+          editId: '0'
+        },
+      })
+    },
     initList() {
       // todo: need user input sanitazation
       this.pageCount = Number(this.$route.query.pageCount) || this.pageCount
@@ -329,6 +344,9 @@ export default {
         document.body.removeChild(a)
       }
     },
+    back() {
+      this.$router.back()
+    },
     async initSearchForm() {
       // todo: change if needed
       let targetIndex
@@ -369,14 +387,15 @@ export default {
       const editId = val.row.id
       // todo: change when needed
       this.$router.push({
-        path: '/contract/edit',
+        path: this.currentRouteName,
         query: {
-          id: editId,
+          editId,
         },
       })
     },
-    handleDelete(val) {
-      this.$confirm('此操作将永久删除该合同, 是否继续?', '提示', {
+    handleDelete(id) {
+      const ids = id ? [id] : this.selectionList.map(item => item.id)
+      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -595,6 +614,10 @@ export default {
     border: 0;
     background-color: transparent;
     margin-left: 0 !important;
+  }
+
+  .create {
+    margin-right: 10px;
   }
 }
 </style>

@@ -38,7 +38,7 @@ function main() {
     collectionDisplayName: '合同',
     modelName: 'contractModel',
     modelFileName: 'contract-model.js',
-    endpointBasePath: 'v1/book',
+    endpointBasePath: 'v1/ims-contract',
     searchFields: [
       {
         displayName: '业务员',
@@ -132,7 +132,7 @@ function main() {
         sortable: true,
       },
       {
-        name: 'ownedBy',
+        name: 'owned_by',
         displayName: '业务员',
         isShow: true,
         sortable: false,
@@ -211,7 +211,6 @@ function main() {
         isShow: true,
         sortable: true,
         type: 'Enum',
-        multiple: true,
         options: [
           {
             value: '已审核',
