@@ -34,90 +34,12 @@ const genAddOrUpdate = data => {
 
 function main() {
   const data = {
-    collectionName: 'gen',
-    collectionDisplayName: '合同',
-    modelName: 'contractModel',
-    modelFileName: 'contract-model.js',
-    endpointBasePath: 'v1/ims-contract',
-    searchFields: [
-      {
-        displayName: '业务员',
-        name: 'owned_by',
-        type: 'Connect',
-        loading: true,
-        options: [],
-      },
-      {
-        displayName: 'PI编号',
-        name: 'PI_NO',
-        type: 'String',
-      },
-      {
-        displayName: '付款状态',
-        name: 'payment_status',
-        type: 'Enum',
-        options: [
-          {
-            value: '支付预付款',
-            label: '支付预付款',
-          },
-          {
-            value: '款项收齐',
-            label: '款项收齐',
-          },
-          {
-            value: '其他',
-            label: '其他',
-          },
-        ],
-      },
-      {
-        displayName: '审核状态',
-        name: 'review_status',
-        type: 'Enum',
-        options: [
-          {
-            value: '已审核',
-            label: '已审核',
-          },
-          {
-            value: '拒绝',
-            label: '拒绝',
-          },
-          {
-            value: '审核中',
-            label: '审核中',
-          },
-        ],
-      },
-      {
-        displayName: '付款方式',
-        name: 'payment_method',
-        type: 'Enum',
-        options: [
-          {
-            value: '阿里信保',
-            label: '阿里信保',
-          },
-          {
-            value: '美金账户',
-            label: '美金账户',
-          },
-          {
-            value: 'PayPal',
-            label: 'PayPal',
-          },
-          {
-            value: '人民币私账',
-            label: '人民币私账',
-          },
-          {
-            value: '1688',
-            label: '1688',
-          },
-        ],
-      },
-    ],
+    collectionName: 'todo',
+    collectionDisplayName: '待办事项',
+    modelName: 'todoModel',
+    modelFileName: 'todo-model.js',
+    endpointBasePath: 'v1/todo',
+    searchFields: [],
     fields: [
       {
         name: 'id',
@@ -126,111 +48,100 @@ function main() {
         sortable: true,
       },
       {
-        name: 'pino',
-        displayName: 'PI编号',
-        isShow: true,
-        sortable: true,
-      },
-      {
         name: 'owned_by',
-        displayName: '业务员',
+        isSearchField: true,
+        displayName: '归属人',
         isShow: true,
         sortable: false,
+        type: 'Connect',
+        isLoading: true,
+        options: [
+          {
+            value: 'Stanley',
+            label: '1',
+          },
+          {
+            value: 'Steve Jobs',
+            label: '2',
+          },
+          {
+            value: 'Gordon',
+            label: '3',
+          },
+        ],
       },
       {
-        name: 'contract_time',
-        displayName: '合同时间',
+        name: 'title',
+        isSearchField: true,
+        displayName: 'Todo 标题',
+        isShow: true,
+        sortable: true,
+        type: 'String',
+      },
+      {
+        name: 'expect_time',
+        displayName: '预计完成日期',
         isShow: true,
         sortable: true,
         type: 'Date',
       },
       {
-        name: 'delivery_time',
-        displayName: '收货时间',
-        isShow: true,
-        sortable: true,
-      },
-      {
-        name: 'total_amount',
-        displayName: '总金额',
+        name: 'detail',
+        displayName: 'Todo 详情',
         isShow: true,
         sortable: true,
         default: '',
+        type: 'Text',
         rules: [
           {
             required: true,
-            message: '请输入总金额',
             trigger: 'blur',
-            type: 'string',
-            pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
           },
         ],
       },
       {
-        name: 'actual_delivery_fee',
-        displayName: '实际运费',
+        name: 'todo_tag',
+        isSearchField: true,
+        displayName: 'Todo 标签',
         isShow: true,
-        sortable: true,
+        type: 'Enum',
+        multiple: false,
+        options: [
+          {
+            value: '未开始',
+            label: '未开始',
+          },
+          {
+            value: '已完成',
+            label: '已完成',
+          },
+          {
+            value: '进行中',
+            label: '进行中',
+          },
+        ],
       },
       {
-        name: 'payment_method',
-        displayName: '付款方式',
+        name: 'todo_cate',
+        isSearchField: true,
+        displayName: 'Todo 分类',
         isShow: true,
-        sortable: true,
-      },
-      {
-        name: 'payment_status',
-        displayName: '支付状态',
-        isShow: true,
-        sortable: true,
+        multiple: true,
         type: 'Enum',
         options: [
           {
-            value: '支付预付款',
-            label: '支付预付款',
+            value: '1',
+            label: '口罩',
           },
           {
-            value: '款项收齐',
-            label: '款项收齐',
+            value: '2',
+            label: '幕布',
           },
           {
-            value: '其他',
-            label: '其他',
+            value: '3',
+            label: '投影仪',
           },
         ],
-      },
-      {
-        name: 'raw_cost',
-        displayName: '成本价',
-        isShow: true,
-        sortable: true,
-      },
-      {
-        name: 'review_status',
-        displayName: '审核状态',
-        isShow: true,
-        sortable: true,
-        type: 'Enum',
-        options: [
-          {
-            value: '已审核',
-            label: '已审核',
-          },
-          {
-            value: '拒绝',
-            label: '拒绝',
-          },
-          {
-            value: '审核中',
-            label: '审核中',
-          },
-        ],
-      },
-      {
-        name: 'client_id',
-        displayName: '客户ID',
-        isShow: false,
-        sortable: true,
       },
     ],
   }
@@ -247,6 +158,7 @@ function main() {
       }
     }
   })
+  data.searchFields = data.fields.filter(item => item.isSearchField === true)
   data.dataFormRaw = dataFormRaw
   genList(data)
   genModel(data)

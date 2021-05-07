@@ -30,6 +30,16 @@ const adminRouter = {
       icon: 'iconfont icon-tushuguanli',
     },
     {
+      title: '待办事项',
+      type: 'view',
+      name: 'todo',
+      route: '/todo',
+      filePath: 'view/gen/todo-list.vue',
+      inNav: true,
+      permission: ['超级管理员独有权限'],
+      icon: 'iconfont icon-tushuguanli',
+    },
+    {
       route: '/admin/user/list',
       name: null,
       title: '用户管理',
