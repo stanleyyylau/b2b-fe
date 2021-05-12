@@ -21,7 +21,7 @@
 
 <script>
 // todo: change model when needed
-import contractModel from '@/model/contractModel'
+// import contractModel from '@/model/contractModel'
 import client from '@/model/client'
 import dataListContainer from './data-list-container'
 import addOrUpdate from './gen-add-or-update'
@@ -54,7 +54,8 @@ export default {
   },
   data() {
     return {
-      model: contractModel,
+      model: null,
+      // model: contractModel,
       pageTitle: '合同',
       currentRouteName: 'gen',
       activeSearchFieldsKey: 'gen-searchFieldsActive',
