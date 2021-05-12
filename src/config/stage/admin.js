@@ -20,16 +20,6 @@ const adminRouter = {
       icon: 'iconfont icon-tushuguanli',
     },
     {
-      title: 'gen test',
-      type: 'view',
-      name: 'gen',
-      route: '/gen',
-      filePath: 'view/gen/gen-list.vue',
-      inNav: true,
-      permission: ['超级管理员独有权限'],
-      icon: 'iconfont icon-tushuguanli',
-    },
-    {
       title: '待办事项',
       type: 'view',
       name: 'todo',
