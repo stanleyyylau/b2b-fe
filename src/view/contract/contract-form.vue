@@ -278,6 +278,7 @@ export default {
         ...res,
         terms_of_sale: res.terms_of_sale.split(','),
         reviewStatus: res.review_status,
+        orireview_status: res.review_status,
         skus: res.skus.map(sku => ({
           spu_sku: [sku.spu_id, sku.sku_id],
           quantity: String(sku.quantity),
@@ -628,7 +629,7 @@ export default {
       return false
     },
     disalbedEdit() {
-      return this.editId !== 0 && this.form.review_status === '已审核'
+      return this.editId !== 0 && this.form.orireview_status === '已审核'
     },
   },
 }
