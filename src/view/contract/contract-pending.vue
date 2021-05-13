@@ -384,7 +384,7 @@ export default {
       total_nums: 0, // 分组内的用户总数
       currentPage: 1, // 默认获取第一页的数据
       pageCount: 10, // 每页10条数据
-      searchForm: {}, // this form is computed by search fields
+      searchForm: { review_status: ['审核中'] }, // this form is computed by search fields
       activeSearchFields: [], // computed
       searchFields: [
         {

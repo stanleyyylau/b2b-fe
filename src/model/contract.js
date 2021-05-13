@@ -13,15 +13,6 @@ class Contract {
     })
   }
 
-  async listPending() {
-    const res = await _axios({
-      method: 'get',
-      url: 'v1/ims-contract/listPending',
-    })
-    const withOwnBy = await replaceOwnedByWithName(res)
-    return this.contractFilter(withOwnBy)
-  }
-
   async list() {
     const res = await _axios({
       method: 'get',
@@ -113,6 +104,26 @@ class Contract {
       items: filterResult,
     }
   }
+
+  // async listPending() {
+  //   const data = {}
+  //   for (const key in params) {
+  //     if (isObjNotEmpty(params[key])) {
+  //       data[key] = params[key]
+  //     }
+  //   }
+  //   const res = await _axios({
+  //     method: 'post',
+  //     url: `v1/ims-contract/page?count=${count}&page=${curPage}`,
+  //     data,
+  //   })
+  //   console.log('page res', res)
+  //   const filterResult = await this.postFilterContractList(res.items)
+  //   return {
+  //     ...res,
+  //     items: filterResult,
+  //   }
+  // }
 
   async postFilterContractList(list) {
     const withOwnBy = await replaceOwnedByWithName(list)
